@@ -26,7 +26,16 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN?.split(",") || "*" }));
+app.use(
+  cors({
+    origin: [
+      "https://mobile-puzzle-3x3-production.up.railway.app",
+      "http://localhost:5173",
+      ...(process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.split(",") : []),
+    ],
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use("/uploads", express.static(uploadDir));
 
