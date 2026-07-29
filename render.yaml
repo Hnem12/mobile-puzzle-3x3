@@ -1,0 +1,34 @@
+services:
+  # 1. Backend Service (Node.js)
+  - type: web
+    name: puzzle-backend
+    env: node
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 4000
+      - key: MONGO_URI
+        sync: false # Bạn cần tự điền URI của MongoDB (ví dụ: MongoDB Atlas) trên Dashboard của Render
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CLIENT_ORIGIN
+        value: "*" # Cho phép tất cả các domain gọi API. Bạn có thể đổi thành tên miền frontend sau khi có.
+
+  # 2. Frontend Service (Static Site)
+  - type: web
+    name: puzzle-frontend
+    env: static
+    rootDir: client
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        # Render sẽ tự động thay biến này bằng URL của backend sau khi backend được deploy
+        fromService:
+          type: web
+          name: puzzle-backend
+          envVarKey: RENDER_EXTERNAL_URL
+        
+      # Mẹo: vì VITE_API_URL cần nối thêm /api, bạn có thể thiết lập thủ công trên bảng điều khiển Render nếu cách trên không nhận diện đúng.
