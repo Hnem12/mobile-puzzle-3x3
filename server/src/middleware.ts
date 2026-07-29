@@ -6,7 +6,7 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction) {
   if (!token) return res.status(401).json({ message: "Missing token" });
 
   try {
-    jwt.verify(token, process.env.JWT_SECRET || "change-me");
+    jwt.verify(token, process.env.JWT_SECRET as string);
     next();
   } catch {
     res.status(401).json({ message: "Invalid token" });

@@ -45,13 +45,15 @@ const publicUrl = (req: express.Request, file: string) =>
 app.post("/api/auth/login", (req, res) => {
   const { username, password } = req.body;
   if (
-    username !== (process.env.ADMIN_USERNAME || "admin") ||
-    password !== (process.env.ADMIN_PASSWORD || "admin123")
+    !process.env.ADMIN_USERNAME ||
+    !process.env.ADMIN_PASSWORD ||
+    username !== process.env.ADMIN_USERNAME ||
+    password !== process.env.ADMIN_PASSWORD
   ) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
   res.json({
-    token: jwt.sign({ role: "admin" }, process.env.JWT_SECRET || "change-me", {
+    token: jwt.sign({ role: "admin" }, process.env.JWT_SECRET as string, {
       expiresIn: "8h",
     }),
   });
@@ -283,9 +285,7 @@ async function leaderboard() {
 }
 
 mongoose
-  .connect(
-    process.env.MONGO_URI || "mongodb://127.0.0.1:27017/mobile-puzzle-3x3",
-  )
+  .connect(process.env.MONGO_URI as string)
   .then(() => {
     app.listen(port, () =>
       console.log(`API running on http://localhost:${port}`),
