@@ -11,17 +11,6 @@ npm run seed
 npm run dev
 ```
 
-- User game: `http://localhost:5173`
-- Admin portal: `http://localhost:5173/admin`
-- API: `http://localhost:4000/api`
-
-Default admin:
-
-```txt
-Username: admin
-Password: admin123
-```
-
 ## Docker
 
 ```bash

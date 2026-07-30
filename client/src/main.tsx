@@ -189,7 +189,39 @@ function Puzzle({ user, level, image, onDone }: { user: any; level: Level; image
 
 function Result({ result, level, onReplay, onLeaderboard }: { result: any; level: Level; onReplay: () => void; onLeaderboard: () => void }) {
   const [rows, setRows] = useState<any[]>([]);
-  useEffect(() => { fetch(`${API}/game/leaderboard?levelId=${level._id}`).then(r => { if (!r.ok) throw new Error("Cannot load leaderboard"); return r.json(); }).then(setRows).catch(() => setRows([])); }, []);
+  useEffect(() => { 
+    fetch(`${API}/game/leaderboard?levelId=${level._id}`)
+      .then(r => { 
+        if (!r.ok) throw new Error("Cannot load leaderboard"); 
+        return r.json(); 
+      })
+      .then((data: any[]) => {
+        const levelPriority: Record<string, number> = {
+          Hard: 3,
+          Medium: 2,
+          Easy: 1
+        };
+
+        const sorted = [...data].sort((a, b) => {
+          const aLevel = a.levelName || a.levelId?.name || "Easy";
+          const bLevel = b.levelName || b.levelId?.name || "Easy";
+          
+          const levelDiff = (levelPriority[bLevel] || 0) - (levelPriority[aLevel] || 0);
+          if (levelDiff !== 0) return levelDiff;
+          
+          const aScore = a.bestScore ?? 0;
+          const bScore = b.bestScore ?? 0;
+          if (bScore !== aScore) {
+            return bScore - aScore;
+          }
+
+          return (a.bestDuration ?? 0) - (b.bestDuration ?? 0);
+        });
+
+        setRows(sorted);
+      })
+      .catch(() => setRows([])); 
+  }, []);
   const fallbackCurrent = result.user ? { fullName: result.user.fullName, phone: result.user.phone, bestDuration: result.duration, score: result.score } : null;
   const rankedRows = rows.length ? rows : fallbackCurrent ? [fallbackCurrent] : [];
   const podium = [rankedRows[1], rankedRows[0], rankedRows[2]];
@@ -312,12 +344,19 @@ function BrandHeader() {
 function Admin() {
   const [token, setToken] = useState(localStorage.getItem("adminToken"));
   const [tab, setTab] = useState("images");
+
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    setToken(null);
+  };
+
   if (!token) return <Login onDone={setToken} />;
   return <main className="admin">
     <nav className="admin-nav">
       <button className={tab === "images" ? "active" : ""} onClick={() => setTab("images")}>Hình ảnh</button>
       <button className={tab === "history" ? "active" : ""} onClick={() => setTab("history")}>Lịch sử chơi</button>
       <button className={tab === "settings" ? "active" : ""} onClick={() => setTab("settings")}>Cấu hình Game</button>
+      <button onClick={handleLogout} style={{ marginLeft: "auto", background: "transparent", color: "inherit", border: "1px solid rgba(255,255,255,0.2)" }}>Đăng xuất</button>
     </nav>
     {tab === "images" && <Images />}
     {tab === "history" && <History />}
