@@ -22,7 +22,7 @@ const app = express();
 const port = Number(process.env.PORT || 4000);
 const uploadDir = path.resolve(__dirname, "../uploads");
 const upload = multer({
-  dest: uploadDir,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
@@ -97,9 +97,13 @@ app.post(
   async (req, res) => {
     if (!req.file)
       return res.status(400).json({ message: "Image is required" });
+      
+    const b64 = req.file.buffer.toString("base64");
+    const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+
     const image = await GameImage.create({
       name: req.body.name || req.file.originalname,
-      imageUrl: publicUrl(req, req.file.filename),
+      imageUrl: dataURI,
       gridSize: Number(req.body.gridSize || 3),
       status: "ACTIVE",
     });
