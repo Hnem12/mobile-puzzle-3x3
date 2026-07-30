@@ -81,9 +81,9 @@ function Game() {
   const activeLevel = boot.levels[0];
 
   if (leaderboard) return <Leaderboard levels={[activeLevel]} onBack={() => setLeaderboard(false)} />;
-  if (result) return <Result result={result} level={activeLevel} onReplay={() => setResult(null)} onLeaderboard={() => setLeaderboard(true)} onLogout={() => setUser(null)} />;
-  if (!user) return <Register onDone={u => setUser(u)} disabled={!boot.settings.gameStatus} />;
-  return <Puzzle user={user} level={activeLevel} image={image} onDone={setResult} onLogout={() => setUser(null)} />;
+  if (result) return <Result result={result} level={activeLevel} onReplay={() => setResult(null)} onLeaderboard={() => setLeaderboard(true)} onLogout={() => { localStorage.removeItem("user"); setUser(null); }} />;
+  if (!user) return <Register onDone={u => { localStorage.setItem("user", JSON.stringify(u)); setUser(u); }} disabled={!boot.settings.gameStatus} />;
+  return <Puzzle user={user} level={activeLevel} image={image} onDone={setResult} onLogout={() => { localStorage.removeItem("user"); setUser(null); }} />;
 }
 
 function Register({ onDone, disabled }: { onDone: (u: any) => void; disabled: boolean }) {
@@ -155,8 +155,8 @@ function Puzzle({ user, level, image, onDone, onLogout }: { user: any; level: Le
         throw new Error(data.message || "Cannot save history");
       }
       onDone({ result, score, duration, moves, user });
-    } catch {
-      alert("Không lưu được lịch sử chơi vào backend. Vui lòng thử lại hoặc kiểm tra API/Mongo.");
+    } catch (e: any) {
+      alert(e.message || "Không lưu được lịch sử chơi vào backend. Vui lòng thử lại hoặc kiểm tra API/Mongo.");
       setFinished(false);
     }
   }

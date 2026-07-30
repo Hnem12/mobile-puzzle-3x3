@@ -354,7 +354,32 @@ async function leaderboard(levelId?: string) {
   ]);
 }
 
-mongoose.connect(process.env.MONGO_URI as string).then(() => {
+mongoose.connect(process.env.MONGO_URI as string).then(async () => {
+  if (await GameLevel.countDocuments() === 0) {
+    await GameLevel.create({
+      name: "Easy",
+      timeLimit: 90,
+      maxScore: 2000,
+      quickWinSeconds: 45,
+      scoreRules: [
+        { withinSeconds: 44, score: 2000 },
+        { withinSeconds: 54, score: 1500 },
+        { withinSeconds: 74, score: 1000 },
+      ],
+    });
+    console.log("Seeded default Easy level.");
+  }
+  
+  if (await GameImage.countDocuments() === 0) {
+    await GameImage.create({
+      name: "Move SECC Demo",
+      imageUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80",
+      status: "ACTIVE",
+      gridSize: 3,
+    });
+    console.log("Seeded default Game Image.");
+  }
+
   app.listen(port, () =>
     console.log(`API running on http://localhost:${port}`),
   );
