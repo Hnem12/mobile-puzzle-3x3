@@ -5,6 +5,9 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; }
+body:has(.game-hero), body:has(.play-screen), body:has(.result-hero) {
+  background-color: #050609;
+}
 button, input, select { font: inherit; }
 button, .button {
   align-items: center;
@@ -645,4 +648,84 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 @media (max-width: 520px) {
   .reward-grid { grid-template-columns: 1fr !important; }
   .qr-box { grid-template-columns: auto 1fr !important; text-align: left; }
+}
+
+/* Admin Login Styles */
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f5f6f8;
+  padding: 24px;
+}
+.login-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.05);
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+.login-card .brand-row {
+  margin-top: 0;
+  margin-bottom: 32px;
+}
+.login-card .brand-logo {
+  max-width: 120px;
+  filter: brightness(0);
+  opacity: 0.8;
+}
+.login-card h2 {
+  color: #09213f;
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+.login-subtitle {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0 0 32px;
+}
+.login-label {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  color: #4b5563;
+}
+.login-label input {
+  font-weight: 400;
+  color: #09213f;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+}
+.login-label input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.login-btn {
+  background: #09213f;
+  border-radius: 8px;
+  font-size: 15px;
+  min-height: 48px;
+  margin-top: 12px;
+  transition: background 0.2s;
+}
+.login-btn:hover:not(:disabled) {
+  background: #1e3a5f;
+}
+.login-error {
+  background: #fef2f2;
+  color: #ef4444;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 8px;
 }

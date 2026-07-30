@@ -299,9 +299,68 @@ function Admin() {
 }
 
 function Login({ onDone }: { onDone: (t: string) => void }) {
-  const [username, setUsername] = useState("admin"); const [password, setPassword] = useState("admin123");
-  async function login(e: React.FormEvent) { e.preventDefault(); const r = await fetch(`${API}/auth/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password }) }); const d = await r.json(); if (d.token) { localStorage.setItem("adminToken", d.token); onDone(d.token); } }
-  return <main className="mobile-shell"><h1>Admin Login</h1><form className="stack" onSubmit={login}><input value={username} onChange={e => setUsername(e.target.value)} /><input type="password" value={password} onChange={e => setPassword(e.target.value)} /><button>Đăng nhập</button></form></main>;
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function login(e: React.FormEvent) { 
+    e.preventDefault(); 
+    setLoading(true);
+    setError("");
+    try {
+      const r = await fetch(`${API}/auth/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password }) }); 
+      const d = await r.json(); 
+      if (r.ok && d.token) { 
+        localStorage.setItem("adminToken", d.token); 
+        onDone(d.token); 
+      } else {
+        setError(d.message || "Tài khoản hoặc mật khẩu không đúng");
+      }
+    } catch {
+      setError("Không thể kết nối đến máy chủ");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <main className="login-container">
+      <div className="login-card">
+        <BrandHeader />
+        <h2>Đăng nhập Hệ thống</h2>
+        <p className="login-subtitle">Vui lòng đăng nhập để truy cập trang quản trị</p>
+        
+        <form className="stack" onSubmit={login}>
+          <label className="login-label">
+            Tên đăng nhập
+            <input 
+              required
+              placeholder="Nhập tên đăng nhập..." 
+              value={username} 
+              onChange={e => setUsername(e.target.value)} 
+            />
+          </label>
+          <label className="login-label">
+            Mật khẩu
+            <input 
+              required
+              type="password" 
+              placeholder="Nhập mật khẩu..." 
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+            />
+          </label>
+          
+          {error && <p className="error login-error">{error}</p>}
+          
+          <button type="submit" className="login-btn" disabled={loading}>
+            {loading ? "Đang xử lý..." : "Đăng nhập"}
+          </button>
+        </form>
+      </div>
+    </main>
+  );
 }
 
 function Images() {
