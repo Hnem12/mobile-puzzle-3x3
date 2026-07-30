@@ -29,7 +29,7 @@ function Game() {
   const [user, setUser] = useState<any>(null);
   const [level, setLevel] = useState<Level | null>(null);
   const [result, setResult] = useState<any>(null);
-  const [leaderboard, setLeaderboard] = useState(false);
+  const [leaderboard, setLeaderboard] = useState(true);
   const [bootError, setBootError] = useState("");
   useEffect(() => {
     fetch(`${API}/game/bootstrap`)
@@ -56,7 +56,10 @@ function Game() {
           window.history.pushState({ trapped: true }, "", window.location.href);
         } else {
           window.removeEventListener("popstate", handlePopState);
-          window.history.back();
+          setLeaderboard(true);
+          setUser(null);
+          setLevel(null);
+          setResult(null);
         }
       }
     };
