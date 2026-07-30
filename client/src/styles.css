@@ -260,13 +260,25 @@ input, select {
 .score-lines { text-align: left; width: 100%; }
 .score-lines p { display: flex; justify-content: space-between; margin: 8px 0; }
 .icon-back {
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.2);
   border-radius: 50%;
-  min-height: 34px;
+  min-height: 38px;
+  width: 38px;
   padding: 0;
   position: absolute;
-  width: 34px;
+  top: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+.icon-back:hover {
+  background: rgba(255,255,255,.2);
+  transform: scale(1.05);
 }
 .podium { align-items: end; display: grid; gap: 8px; grid-template-columns: repeat(3, 1fr); height: 78px; }
 .podium span {

@@ -7,6 +7,7 @@ import logoKingsport from "./assets/logo-kingsport.png";
 import imgTop1 from "./assets/top1.png";
 import imgTop2 from "./assets/top2.png";
 import imgTop3 from "./assets/top3.png";
+import formBg from "./assets/form-bg.png";
 import "./styles.css";
 import QRCode from "react-qr-code";
 
@@ -71,8 +72,8 @@ function Register({ onDone, disabled }: { onDone: (u: any) => void; disabled: bo
     <BrandHeader />
     <h1>Đăng ký tham gia</h1>
     <form onSubmit={submit} className="game-card stack red-glow">
-      <label><span className="label-with-icon"><User size={14} /> HỌ VÀ TÊN*</span><input required placeholder="Nhập họ và tên..." value={fullName} onChange={e => setFullName(e.target.value)} /></label>
-      <label><span className="label-with-icon"><Phone size={14} /> SỐ ĐIỆN THOẠI*</span><input required placeholder="Nhập số điện thoại..." value={phone} onChange={e => setPhone(e.target.value)} /></label>
+      <label><span className="label-with-icon"><User size={14} /> HỌ VÀ TÊN *</span><input required placeholder="Nhập họ và tên..." value={fullName} onChange={e => setFullName(e.target.value)} /></label>
+      <label><span className="label-with-icon"><Phone size={14} /> SỐ ĐIỆN THOẠI *</span><input required placeholder="Nhập số điện thoại..." value={phone} onChange={e => setPhone(e.target.value)} /></label>
       <label><span className="label-with-icon"><MapPin size={14} /> ĐỊA CHỈ</span><input placeholder="Nhập địa chỉ hiện tại..." value={address} onChange={e => setAddress(e.target.value)} /></label>
       
       <div className="radio-group-label">NHU CẦU MUA SẮM</div>
@@ -142,7 +143,7 @@ function Puzzle({ user, level, image, onDone }: { user: any; level: Level; image
     [next[i], next[blank]] = [next[blank], next[i]];
     setTiles(next); setMoves(m => m + 1);
   }
-  return <main className="play-screen">
+  return <main className="play-screen" style={{ backgroundImage: `url(${formBg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
     <BrandHeader />
     <header><strong>Ảnh mẫu</strong><span>{left.toFixed(2)}s</span></header>
     <div className="progress"><i style={{ width: `${(left / level.timeLimit) * 100}%` }} /></div>
