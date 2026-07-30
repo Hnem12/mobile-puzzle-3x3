@@ -190,7 +190,7 @@ function Puzzle({ user, level, image, onDone }: { user: any; level: Level; image
 function Result({ result, level, onReplay, onLeaderboard }: { result: any; level: Level; onReplay: () => void; onLeaderboard: () => void }) {
   const [rows, setRows] = useState<any[]>([]);
   useEffect(() => { 
-    fetch(`${API}/game/leaderboard?levelId=${level._id}`)
+    fetch(`${API}/game/leaderboard`)
       .then(r => { 
         if (!r.ok) throw new Error("Cannot load leaderboard"); 
         return r.json(); 
@@ -225,6 +225,7 @@ function Result({ result, level, onReplay, onLeaderboard }: { result: any; level
   const fallbackCurrent = result.user ? { fullName: result.user.fullName, phone: result.user.phone, bestDuration: result.duration, score: result.score } : null;
   const rankedRows = rows.length ? rows : fallbackCurrent ? [fallbackCurrent] : [];
   const podium = [rankedRows[1], rankedRows[0], rankedRows[2]];
+  const podiumLabels = ["TOP 2", "TOP 1", "TOP 3"];
   const currentIndex = result.user?.phone ? rankedRows.findIndex(row => row.phone === result.user.phone) : -1;
   const currentRank = currentIndex >= 0 ? currentIndex + 1 : null;
   const rest = rankedRows.slice(3, 5);
@@ -236,16 +237,15 @@ function Result({ result, level, onReplay, onLeaderboard }: { result: any; level
     <strong className="time-result">{formatTime(result.duration)}</strong>
     <b className="winner-copy">Thật tuyệt vời</b>
     <p className="result-copy">{currentRank ? currentRank <= 3 ? <>Bạn đang ở <b>Top {currentRank}</b> chế độ <b>{level.name}</b>.</> : <>Bạn đang ở <b>hạng {currentRank}</b> chế độ <b>{level.name}</b>.</> : <>Kết quả của bạn đã được ghi nhận và BXH đang cập nhật.</>} Liên tục cập nhật BXH để theo dõi cơ hội nhận <b>01 chiếc xe máy điện Athena.</b></p>
-    <div className="top-board result-board">
-      {["TOP 2", "TOP 1", "TOP 3"].map((label, i) => <article className={`top-card top-${i + 1}`} key={label}>
-        <div className="prize-orb"><img src={[imgTop2, imgTop1, imgTop3][i]} alt={label} /></div>
-        <strong className="rank-label">{label}</strong>
-        <b>{podium[i]?.fullName || "Chưa có dữ liệu"}</b>
-        <time>{formatTime(podium[i]?.bestDuration)}</time>
-      </article>)}
-      <div className="rank-list mini">
-        {rest.length ? rest.map((row, i) => <p key={row.phone || i}><span>{i + 4}</span><strong>{row.fullName}<small>{maskPhone(row.phone)}</small></strong><b>{formatSeconds(row.bestDuration)}</b></p>) : <p><span>{currentIndex >= 0 ? currentIndex + 1 : "--"}</span><strong>{result.user?.fullName || "Bạn"}<small>{maskPhone(result.user?.phone)}</small></strong><b>{formatSeconds(result.duration)}</b></p>}
-      </div>
+    
+    <div className="top-board">{podium.map((row, i) => <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
+      <div className="prize-orb"><img src={[imgTop2, imgTop1, imgTop3][i]} alt={podiumLabels[i]} /></div>
+      <strong className="rank-label">{podiumLabels[i]}</strong>
+      <b>{row?.fullName || "Chưa có dữ liệu"}</b>
+      <time>{formatTime(row?.bestDuration)}</time>
+    </article>)}</div>
+    <div className="rank-list compact">
+      {rest.length ? rest.map((row, i) => <p key={row.phone || i}><span>{String(i + 4).padStart(2, "0")}</span><strong>{row.fullName}</strong><b>{formatTime(row.bestDuration)}</b></p>) : <p><span>{currentIndex >= 0 ? String(currentIndex + 1).padStart(2, "0") : "--"}</span><strong>{result.user?.fullName || "Bạn"}</strong><b>{formatTime(result.duration)}</b></p>}
     </div>
     <button className="primary-red notify" onClick={onLeaderboard}><Bell size={16} /> THEO DÕI BẢNG XẾP HẠNG QUA ZALO NGAY</button>
   </section></main>;
@@ -442,10 +442,45 @@ function Images() {
 
 function History() {
   const [rows, setRows] = useState<any[]>([]); const [q, setQ] = useState("");
-  useEffect(() => { fetch(`${API}/admin/histories?name=${q}`, { headers: auth() }).then(r => {
-    if (r.status === 401) { localStorage.removeItem("adminToken"); window.location.reload(); return []; }
-    if (!r.ok) throw new Error("Cannot load histories"); return r.json(); 
-  }).then(data => setRows(Array.isArray(data) ? data : [])).catch(() => setRows([])); }, [q]);
+  useEffect(() => { 
+    fetch(`${API}/admin/histories?name=${q}`, { headers: auth() })
+      .then(r => {
+        if (r.status === 401) { localStorage.removeItem("adminToken"); window.location.reload(); return []; }
+        if (!r.ok) throw new Error("Cannot load histories"); return r.json(); 
+      })
+      .then(data => {
+        if (!Array.isArray(data)) return setRows([]);
+        
+        const levelPriority: Record<string, number> = {
+          Hard: 3,
+          Medium: 2,
+          Easy: 1
+        };
+
+        const sorted = [...data].sort((a, b) => {
+          if (a.result !== b.result) {
+            return a.result === "WIN" ? -1 : 1;
+          }
+
+          const aLevel = a.levelName || a.levelId?.name || "Easy";
+          const bLevel = b.levelName || b.levelId?.name || "Easy";
+          
+          const levelDiff = (levelPriority[bLevel] || 0) - (levelPriority[aLevel] || 0);
+          if (levelDiff !== 0) return levelDiff;
+          
+          const aScore = a.score ?? a.bestScore ?? 0;
+          const bScore = b.score ?? b.bestScore ?? 0;
+          if (bScore !== aScore) {
+            return bScore - aScore;
+          }
+
+          return (a.duration ?? a.bestDuration ?? 0) - (b.duration ?? b.bestDuration ?? 0);
+        });
+
+        setRows(sorted);
+      })
+      .catch(() => setRows([])); 
+  }, [q]);
   async function exportExcel() {
     const res = await fetch(`${API}/admin/histories/export?name=${q}`, { headers: auth() });
     if (!res.ok) return;
