@@ -242,7 +242,7 @@ function Result({ result, level, onReplay, onLeaderboard, onLogout }: { result: 
     <p className="muted-label">Thời gian của bạn</p>
     <strong className="time-result">{formatTime(result.duration)}</strong>
     <b className="winner-copy">Thật tuyệt vời</b>
-    <p className="result-copy">{currentRank ? currentRank <= 3 ? <>Bạn đang ở <b>Top {currentRank}</b>.</> : <>Bạn đang ở <b>hạng {currentRank}</b> chế độ <b>{level.name}</b>.</> : <>Kết quả của bạn đã được ghi nhận và BXH đang cập nhật.</>} Liên tục cập nhật BXH để theo dõi cơ hội nhận <b>01 chiếc xe máy điện Athena.</b></p>
+    <p className="result-copy">{currentRank ? currentRank <= 3 ? <>Bạn đang ở <b>Top {currentRank}</b>.</> : <>Bạn đang ở <b>hạng {currentRank}</b>.</> : <>Kết quả của bạn đã được ghi nhận và BXH đang cập nhật.</>} Liên tục cập nhật BXH để theo dõi cơ hội nhận <b>01 chiếc xe máy điện Athena.</b></p>
     
     <div className="top-board">{podium.map((row, i) => <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
       <div className="prize-orb"><img src={[imgTop2, imgTop1, imgTop3][i]} alt={podiumLabels[i]} /></div>
