@@ -122,6 +122,9 @@ app.delete("/api/admin/images/:id", requireAdmin, async (req, res) => {
 app.get("/api/admin/levels", requireAdmin, async (_req, res) =>
   res.json(await GameLevel.find().sort({ maxScore: 1 })),
 );
+app.post("/api/admin/levels", requireAdmin, async (req, res) => {
+  res.status(201).json(await GameLevel.create(req.body));
+});
 app.put("/api/admin/levels/:id", requireAdmin, async (req, res) => {
   res.json(
     await GameLevel.findByIdAndUpdate(req.params.id, req.body, { new: true }),

@@ -76,10 +76,13 @@ function Game() {
 
   if (bootError) return <main className="game-hero"><section className="phone-panel"><h1>Lỗi kết nối</h1><p>{bootError}</p></section></main>;
   if (!boot) return <main className="game-hero"><section className="phone-panel"><h1>Đang tải...</h1></section></main>;
-  if (leaderboard) return <Leaderboard levels={boot.levels} onBack={() => setLeaderboard(false)} />;
-  if (result) return <Result result={result} level={boot.levels[0]} onReplay={() => setResult(null)} onLeaderboard={() => setLeaderboard(true)} onLogout={() => setUser(null)} />;
+  if (!boot.levels || boot.levels.length === 0) return <main className="game-hero"><section className="phone-panel"><h1>Chưa cấu hình Game</h1><p>Vui lòng chạy lệnh cài đặt dữ liệu (seed) hoặc cấu hình mức độ chơi trong trang Admin để bắt đầu.</p></section></main>;
+
+  const activeLevel = boot.levels[0];
+
+  if (result) return <Result result={result} level={activeLevel} onReplay={() => setResult(null)} onLeaderboard={() => setLeaderboard(true)} onLogout={() => setUser(null)} />;
   if (!user) return <Register onDone={u => setUser(u)} disabled={!boot.settings.gameStatus} />;
-  return <Puzzle user={user} level={boot.levels[0]} image={image} onDone={setResult} onLogout={() => setUser(null)} />;
+  return <Puzzle user={user} level={activeLevel} image={image} onDone={setResult} onLogout={() => setUser(null)} />;
 }
 
 function Register({ onDone, disabled }: { onDone: (u: any) => void; disabled: boolean }) {
@@ -164,6 +167,7 @@ function Puzzle({ user, level, image, onDone, onLogout }: { user: any; level: Le
     setTiles(next); setMoves(m => m + 1);
   }
   return <main className="play-screen" style={{ "--racing-bg": `url(${formBg})` } as React.CSSProperties}>
+    <button type="button" onClick={onLogout} style={{ position: 'absolute', top: 20, right: 20, background: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer', zIndex: 10 }}>Đổi người chơi</button>
     <BrandHeader />
     <header><strong>Ảnh mẫu</strong><span>{left.toFixed(2)}s</span></header>
     <div className="progress"><i style={{ width: `${(left / level.timeLimit) * 100}%` }} /></div>
@@ -479,10 +483,12 @@ function History() {
 }
 function Settings() {
   const [levels, setLevels] = useState<Level[]>([]);
-  useEffect(() => { fetch(`${API}/admin/levels`, { headers: auth() }).then(r => {
+  const load = () => fetch(`${API}/admin/levels`, { headers: auth() }).then(r => {
     if (r.status === 401) { localStorage.removeItem("adminToken"); window.location.reload(); return []; }
     return r.ok ? r.json() : [];
-  }).then(data => setLevels(Array.isArray(data) ? data : [])); }, []);
+  }).then(data => setLevels(Array.isArray(data) ? data : []));
+  
+  useEffect(() => { load(); }, []);
   
   function patch(i: number, data: Partial<Level>) { setLevels(v => v.map((l, ix) => ix === i ? { ...l, ...data } : l)); }
   
@@ -491,8 +497,25 @@ function Settings() {
     await fetch(`${API}/admin/levels/${current._id}`, { method: "PUT", headers: { ...auth(), "Content-Type": "application/json" }, body: JSON.stringify(current) });
     alert(`Lưu cấu hình thành công!`);
   }
+
+  async function createDefaultLevel() {
+    await fetch(`${API}/admin/levels`, { method: "POST", headers: { ...auth(), "Content-Type": "application/json" }, body: JSON.stringify({ name: "Easy", timeLimit: 90, maxScore: 2000, quickWinSeconds: 45, scoreRules: [{ withinSeconds: 44, score: 2000 }, { withinSeconds: 54, score: 1500 }, { withinSeconds: 74, score: 1000 }] }) });
+    alert(`Đã khởi tạo dữ liệu mặc định!`);
+    load();
+  }
   
-  return <section><h1>Cấu hình Game</h1><div className="level-grid">{levels.map((l, i) => <article className="config-card" key={l._id}><h3>Mức độ mặc định <span>3x3</span></h3><label>Thời gian (giây)<input type="number" value={l.timeLimit} onChange={e => patch(i, { timeLimit: +e.target.value })} /></label><label>Điểm tối đa<input type="number" value={l.maxScore} onChange={e => patch(i, { maxScore: +e.target.value })} /></label><button onClick={() => saveLevel(i)}>Lưu cấu hình</button></article>)}</div></section>;
+  return <section>
+    <h1>Cấu hình Game</h1>
+    {levels.length === 0 ? (
+      <div className="admin-card" style={{textAlign: "center", padding: 40}}>
+        <h3>Chưa có cấu hình nào</h3>
+        <p>Database hiện tại đang trống. Vui lòng khởi tạo cấu hình mặc định để Game có thể hoạt động.</p>
+        <button onClick={createDefaultLevel} className="primary-red" style={{marginTop: 15}}>Khởi tạo Cấu hình Mặc định</button>
+      </div>
+    ) : (
+      <div className="level-grid">{levels.map((l, i) => <article className="config-card" key={l._id}><h3>Mức độ mặc định <span>3x3</span></h3><label>Thời gian (giây)<input type="number" value={l.timeLimit} onChange={e => patch(i, { timeLimit: +e.target.value })} /></label><label>Điểm tối đa<input type="number" value={l.maxScore} onChange={e => patch(i, { maxScore: +e.target.value })} /></label><button onClick={() => saveLevel(i)}>Lưu cấu hình</button></article>)}</div>
+    )}
+  </section>;
 }
 
 function shuffleSolvable(solved: number[]): number[] {
