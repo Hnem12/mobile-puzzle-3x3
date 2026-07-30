@@ -167,13 +167,38 @@ function Puzzle({ user, level, image, onDone, onLogout }: { user: any; level: Le
     [next[i], next[blank]] = [next[blank], next[i]];
     setTiles(next); setMoves(m => m + 1);
   }
+  const correctCount = tiles.reduce((acc, tile, idx) => acc + (tile === solved[idx] ? 1 : 0), 0);
+
   return <main className="play-screen" style={{ "--racing-bg": `url(${formBg})` } as React.CSSProperties}>
     <button type="button" onClick={onLogout} style={{ position: 'absolute', top: 20, right: 20, background: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer', zIndex: 10 }}>Đổi người chơi</button>
     <BrandHeader />
-    <header><strong>Ảnh mẫu</strong><span>{left.toFixed(2)}s</span></header>
+    
+    <div className="puzzle-header-info">
+      <div className="player-info-col">
+        <div className="player-name-wrap">
+          <span className="muted-label"><User size={14} /> Người chơi</span>
+          <h2 className="player-name">{user.fullName}</h2>
+        </div>
+        <div className="instruction-wrap">
+          <strong className="correct-count">{correctCount}/9 vị trí đúng</strong>
+          <p className="instruction-text">Bấm vào ô kề ô trống để di chuyển thành hình hoàn thiện</p>
+        </div>
+      </div>
+      <div className="sample-image-col">
+        <div className="sample-card">
+          <div className="sample-card-header">HÌNH ẢNH HOÀN CHỈNH</div>
+          {image ? <img className="sample-img" src={image.imageUrl} alt="Mẫu" /> : <div className="sample-placeholder" />}
+        </div>
+      </div>
+    </div>
+
+    <div className="play-screen-timer">
+      <strong>Thời gian</strong>
+      <span>{left.toFixed(2)}s</span>
+    </div>
     <div className="progress"><i style={{ width: `${(left / level.timeLimit) * 100}%` }} /></div>
     <div className="play-meta"><span>Điểm: {calcScore(level, level.timeLimit - left, moves)}</span><span>{moves} bước</span></div>
-    {image && <img className="sample" src={image.imageUrl} alt="Mẫu" />}
+
     <section className="board">{tiles.map((tile, i) => <button key={i} className={tile ? "tile" : "blank"} onClick={() => move(i)} style={tile ? tileStyle(tile, image?.imageUrl) : {}} />)}</section>
     <button className="primary-red" disabled={!done} onClick={() => finish("WIN")}>Hoàn tất quà</button>
   </main>;

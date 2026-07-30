@@ -233,14 +233,23 @@ input, select {
 .progress { background: rgba(255,255,255,.14); border-radius: 999px; height: 6px; overflow: hidden; }
 .progress i { background: #ef1c30; display: block; height: 100%; transition: width .3s ease; }
 .play-meta { color: #ffb2bb; display: flex; font-size: 12px; font-weight: 800; justify-content: space-between; }
-.sample {
-  aspect-ratio: 1;
-  border: 1px solid #ef1c30;
-  border-radius: 4px;
-  justify-self: end;
-  object-fit: cover;
-  width: 86px;
-}
+
+.puzzle-header-info { display: flex; justify-content: space-between; gap: 16px; margin: 12px 0 24px; align-items: stretch; }
+.player-info-col { display: flex; flex-direction: column; justify-content: space-between; gap: 8px; flex: 1; }
+.player-name-wrap { display: flex; flex-direction: column; gap: 4px; }
+.player-name { font-size: 22px; font-weight: 900; color: white; margin: 0; line-height: 1.1; }
+.instruction-wrap { display: flex; flex-direction: column; gap: 6px; }
+.correct-count { color: #ef1c30; font-size: 16px; font-weight: 900; line-height: 1; }
+.instruction-text { color: rgba(255,255,255,.85); font-size: 14px; margin: 0; line-height: 1.35; max-width: 220px; font-weight: 500; }
+.sample-image-col { display: flex; align-items: flex-end; }
+.sample-card { background: rgba(0,0,0,.5); border: 1px solid #ef1c30; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; width: 110px; flex-shrink: 0; }
+.sample-card-header { background: #5b1018; color: #ef1c30; font-size: 9px; font-weight: 800; text-align: center; padding: 6px 4px; text-transform: uppercase; }
+.sample-img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.sample-placeholder { width: 100%; aspect-ratio: 1; background: #2a0d15; }
+.play-screen-timer { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.play-screen-timer strong { font-size: 15px; font-weight: 800; color: white; }
+.play-screen-timer span { font-size: 16px; font-weight: 900; color: white; }
+
 .board {
   aspect-ratio: 1;
   display: grid;
