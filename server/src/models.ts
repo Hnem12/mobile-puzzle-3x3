@@ -6,7 +6,10 @@ export type GameResult = "WIN" | "LOSE";
 const userSchema = new Schema(
   {
     fullName: { type: String, required: true, trim: true },
-    phone: { type: String, required: true, trim: true, index: true }
+    phone: { type: String, required: true, trim: true, index: true },
+    address: { type: String, trim: true },
+    customerType: { type: String, enum: ["retail", "agency"] },
+    productOfInterest: { type: String, enum: ["move", "kingsport"] }
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 );

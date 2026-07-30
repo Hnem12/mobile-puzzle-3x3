@@ -195,7 +195,13 @@ app.get("/api/game/bootstrap", async (_req, res) => {
 });
 app.post("/api/game/register", async (req, res) => {
   const parsed = z
-    .object({ fullName: z.string().min(2), phone: z.string().min(8) })
+    .object({
+      fullName: z.string().trim().min(2, "Họ tên phải có ít nhất 2 ký tự"),
+      phone: z.string().trim().min(8, "Số điện thoại không hợp lệ"),
+      address: z.string().optional(),
+      customerType: z.enum(["retail", "agency"]).optional(),
+      productOfInterest: z.enum(["move", "kingsport"]).optional()
+    })
     .safeParse(req.body);
   if (!parsed.success)
     return res

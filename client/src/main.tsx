@@ -436,7 +436,7 @@ function Images() {
 function History() {
   const [rows, setRows] = useState<any[]>([]); const [q, setQ] = useState("");
   useEffect(() => { 
-    fetch(`${API}/admin/histories?name=${q}`, { headers: auth() })
+    fetch(`${API}/admin/histories?name=${encodeURIComponent(q)}`, { headers: auth() })
       .then(r => {
         if (r.status === 401) { localStorage.removeItem("adminToken"); window.location.reload(); return []; }
         if (!r.ok) throw new Error("Cannot load histories"); return r.json(); 
