@@ -81,7 +81,7 @@ function Game() {
   const activeLevel = boot.levels[0];
 
   if (leaderboard) return <Leaderboard levels={[activeLevel]} onBack={() => setLeaderboard(false)} />;
-  if (result) return <Result result={result} level={activeLevel} onReplay={() => setResult(null)} onLeaderboard={() => setLeaderboard(true)} onLogout={() => { localStorage.removeItem("user"); setUser(null); }} />;
+  if (result) return <Result result={result} level={activeLevel} onReplay={() => setResult(null)} onLeaderboard={() => setLeaderboard(true)} onLogout={() => { localStorage.removeItem("user"); setUser(null); setResult(null); }} />;
   if (!user) return <Register onDone={u => { localStorage.setItem("user", JSON.stringify(u)); setUser(u); }} disabled={!boot.settings.gameStatus} />;
   return <Puzzle user={user} level={activeLevel} image={image} onDone={setResult} onLogout={() => { localStorage.removeItem("user"); setUser(null); }} />;
 }
