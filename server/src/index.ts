@@ -57,8 +57,10 @@ app.get("/", (req, res) => {
 app.use(express.json());
 app.use("/uploads", express.static(uploadDir));
 
-const publicUrl = (req: express.Request, file: string) =>
-  `${req.protocol}://${req.get("host")}/uploads/${file}`;
+const publicUrl = (req: express.Request, file: string) => {
+  const protocol = req.headers["x-forwarded-proto"] || req.protocol;
+  return `${protocol}://${req.get("host")}/uploads/${file}`;
+};
 
 app.post("/api/auth/login", (req, res) => {
   const { username, password } = req.body;
@@ -217,6 +219,14 @@ app.post("/api/game/histories", async (req, res) => {
   if (!parsed.success)
     return res.status(400).json({ message: "Dữ liệu lượt chơi không hợp lệ" });
 
+  const settings = await getSettings();
+  if (
+    !settings.allowMultiplePlay &&
+    (await GameHistory.exists({ userId: parsed.data.userId }))
+  ) {
+    return res.status(409).json({ message: "Tài khoản này đã ghi nhận kết quả trò chơi" });
+  }
+
   res.status(201).json(await GameHistory.create(parsed.data));
 });
 app.get("/api/game/leaderboard", async (req, res) =>
@@ -273,17 +283,42 @@ async function leaderboard(levelId?: string) {
 
   return GameHistory.aggregate([
     { $match: match },
-    { $sort: { duration: 1, score: -1, moves: 1 } },
+    {
+      $lookup: {
+        from: "game_levels",
+        localField: "levelId",
+        foreignField: "_id",
+        as: "level",
+      },
+    },
+    { $unwind: "$level" },
+    {
+      $addFields: {
+        levelPriority: {
+          $switch: {
+            branches: [
+              { case: { $eq: ["$level.name", "Hard"] }, then: 3 },
+              { case: { $eq: ["$level.name", "Medium"] }, then: 2 },
+              { case: { $eq: ["$level.name", "Easy"] }, then: 1 }
+            ],
+            default: 0
+          }
+        }
+      }
+    },
+    { $sort: { levelPriority: -1, score: -1, duration: 1, moves: 1 } },
     {
       $group: {
         _id: "$userId",
         bestDuration: { $first: "$duration" },
         score: { $first: "$score" },
         moves: { $first: "$moves" },
+        levelName: { $first: "$level.name" },
+        levelPriority: { $first: "$levelPriority" },
         plays: { $sum: 1 },
       },
     },
-    { $sort: { bestDuration: 1, score: -1, moves: 1 } },
+    { $sort: { levelPriority: -1, score: -1, bestDuration: 1, moves: 1 } },
     { $limit: 10 },
     {
       $lookup: {
@@ -303,6 +338,8 @@ async function leaderboard(levelId?: string) {
         plays: 1,
         bestDuration: 1,
         moves: 1,
+        levelName: 1,
+        levelPriority: 1
       },
     },
   ]);

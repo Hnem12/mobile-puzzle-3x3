@@ -219,24 +219,51 @@ function Result({ result, level, onReplay, onLeaderboard }: { result: any; level
   </section></main>;
 }
 function Leaderboard({ levels, onBack }: { levels: Level[]; onBack: () => void }) {
-  const [activeLevel, setActiveLevel] = useState(levels[0]?._id);
   const [rows, setRows] = useState<any[]>([]);
+  
   useEffect(() => { 
-    if (!activeLevel) return;
-    fetch(`${API}/game/leaderboard?levelId=${activeLevel}`).then(r => { if (!r.ok) throw new Error("Cannot load leaderboard"); return r.json(); }).then(setRows).catch(() => setRows([])); 
-  }, [activeLevel]);
+    fetch(`${API}/game/leaderboard`)
+      .then(r => { 
+        if (!r.ok) throw new Error("Cannot load leaderboard"); 
+        return r.json(); 
+      })
+      .then((data: any[]) => {
+        const levelPriority: Record<string, number> = {
+          Hard: 3,
+          Medium: 2,
+          Easy: 1
+        };
+
+        const sorted = [...data].sort((a, b) => {
+          const aLevel = a.levelName || a.levelId?.name || "Easy";
+          const bLevel = b.levelName || b.levelId?.name || "Easy";
+          
+          const levelDiff = (levelPriority[bLevel] || 0) - (levelPriority[aLevel] || 0);
+          if (levelDiff !== 0) return levelDiff;
+          
+          const aScore = a.bestScore ?? 0;
+          const bScore = b.bestScore ?? 0;
+          if (bScore !== aScore) {
+            return bScore - aScore;
+          }
+
+          return (a.bestDuration ?? 0) - (b.bestDuration ?? 0);
+        });
+
+        setRows(sorted);
+      })
+      .catch(() => setRows([])); 
+  }, []);
+
   const podium = [rows[1], rows[0], rows[2]];
   const podiumLabels = ["TOP 2", "TOP 1", "TOP 3"];
-  const products = ["MOVE", "KING", "PLUS"];
   const rest = rows.slice(3);
+
   return <main className="game-hero leaderboard-screen"><section className="leaderboard-panel">
     <button className="icon-back" onClick={onBack} aria-label="Quay lại"><ChevronLeft size={18} /></button>
     <BrandHeader />
     <div className="leaderboard-header-title">
       <h1><span className="bolt"><Zap size={22} fill="currentColor" /></span> Move to be king</h1>
-      <div className="level-tabs">
-        {levels.map(l => <button key={l._id} className={activeLevel === l._id ? "active" : ""} onClick={() => setActiveLevel(l._id)}>{l.name}</button>)}
-      </div>
       <p className="subtitle">The faster hand</p>
     </div>
     <div className="top-board">{podium.map((row, i) => <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
@@ -371,7 +398,7 @@ function Images() {
   }).then(data => setImages(Array.isArray(data) ? data : []));
   useEffect(() => { void load(); }, []);
   async function upload() { if (!file) return; const f = new FormData(); f.append("image", file); f.append("name", file.name); f.append("gridSize", "3"); await fetch(`${API}/admin/images`, { method: "POST", headers: auth(), body: f }); setFile(null); load(); }
-  return <section><h1>Hình ảnh</h1><div className="admin-card compact-upload"><h3>Upload ảnh mới</h3><div className="upload-row"><label className="file-label"><input type="file" accept="image/*" onChange={e => setFile(e.target.files?.[0] || null)} style={{display: "none"}} /><span className="file-name">{file ? file.name : "Nhấn để chọn ảnh từ máy..."}</span></label><button onClick={upload} disabled={!file} className={file ? "btn-upload-ready" : ""}><Upload size={16} /> Tải lên</button></div></div><table><thead><tr><th>Xem trước</th><th>Lưới</th><th>Trạng thái</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead><tbody>{images.map(img => <tr key={img._id}><td><img className="thumb" src={img.imageUrl} /></td><td><span className="pill">3x3</span></td><td><span className={img.status === "ACTIVE" ? "ok" : "bad"}>{img.status === "ACTIVE" ? "Hoạt động" : "Tạm dừng"}</span></td><td>{img.createdAt?.slice(0, 10)}</td><td><div className="action-buttons"><button onClick={() => fetch(`${API}/admin/images/${img._id}/status`, { method: "PATCH", headers: { ...auth(), "Content-Type": "application/json" }, body: JSON.stringify({ status: img.status === "ACTIVE" ? "INACTIVE" : "ACTIVE" }) }).then(load)}>{img.status === "ACTIVE" ? <><Pause size={14} /> Tạm ngưng</> : <><Play size={14} /> Kích hoạt</>}</button><button className="danger" onClick={() => fetch(`${API}/admin/images/${img._id}`, { method: "DELETE", headers: auth() }).then(load)}><X size={14} /> Xóa</button></div></td></tr>)}</tbody></table></section>;
+  return <section><h1>Hình ảnh</h1><div className="admin-card compact-upload"><h3>Upload ảnh mới</h3><div className="upload-row"><label className="file-label"><input type="file" accept="image/*" onChange={e => setFile(e.target.files?.[0] || null)} style={{display: "none"}} /><span className="file-name">{file ? file.name : "Nhấn để chọn ảnh từ máy..."}</span></label><button onClick={upload} disabled={!file} className={file ? "btn-upload-ready" : ""}><Upload size={16} /> Tải lên</button></div></div><table><thead><tr><th>Xem trước</th><th>Lưới</th><th>Trạng thái</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead><tbody>{images.map(img => <tr key={img._id}><td><img className="thumb" src={img.imageUrl} /></td><td><span className="pill">3x3</span></td><td><span className={img.status === "ACTIVE" ? "ok" : "bad"}>{img.status === "ACTIVE" ? "Hoạt động" : "Tạm dừng"}</span></td><td>{img.createdAt?.slice(0, 10)}</td><td><div className="action-buttons"><button className={img.status === "ACTIVE" ? "warning" : "ok"} onClick={() => fetch(`${API}/admin/images/${img._id}/status`, { method: "PATCH", headers: { ...auth(), "Content-Type": "application/json" }, body: JSON.stringify({ status: img.status === "ACTIVE" ? "INACTIVE" : "ACTIVE" }) }).then(load)}>{img.status === "ACTIVE" ? "Tạm ngưng" : "Kích hoạt"}</button><button className="danger" onClick={() => fetch(`${API}/admin/images/${img._id}`, { method: "DELETE", headers: auth() }).then(load)}>Xóa</button></div></td></tr>)}</tbody></table></section>;
 }
 
 function History() {

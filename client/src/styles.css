@@ -8,7 +8,7 @@ body { margin: 0; }
 body:has(.game-hero), body:has(.play-screen), body:has(.result-hero) {
   background-color: #050609;
 }
-body:has(.admin), body:has(.login-container) {
+body:has(.login-container) {
   background-image: url('./assets/racing-city-bg.jpg');
   background-size: cover;
   background-position: center;
@@ -409,6 +409,37 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 .ok { background: #d8fbe8; color: #008144; }
 .bad { background: #ffe0e0; color: #d20c0c; }
 .danger { background: #fff4f4; border: 1px solid #f1a0a0; color: #df1111; margin-left: 8px; }
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+.action-buttons button {
+  min-height: auto;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 4px;
+  margin: 0;
+  background: transparent;
+}
+.action-buttons button.warning {
+  background: #fffbe6;
+  border: 1px solid #f4d03f;
+  color: #b4860b;
+}
+.action-buttons button.warning:hover { background: #fff1b8; }
+.action-buttons button.ok {
+  background: #d8fbe8;
+  border: 1px solid #9ae6b4;
+  color: #008144;
+}
+.action-buttons button.ok:hover { background: #c6f6d5; }
+.action-buttons button.danger {
+  background: #fff4f4;
+  border: 1px solid #f1a0a0;
+  color: #df1111;
+}
+.action-buttons button.danger:hover { background: #fee2e2; }
 .level-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 .config-card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(15, 23, 42, .08); display: grid; gap: 16px; padding: 20px; }
 .config-card h3 span { color: #4b5563; margin-left: 10px; }
