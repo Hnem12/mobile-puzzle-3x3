@@ -641,3 +641,8 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 .leaderboard-panel .brand-row {
   margin-top: 24px;
 }
+
+@media (max-width: 520px) {
+  .reward-grid { grid-template-columns: 1fr !important; }
+  .qr-box { grid-template-columns: auto 1fr !important; text-align: left; }
+}
