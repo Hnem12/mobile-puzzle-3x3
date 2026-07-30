@@ -255,7 +255,7 @@ function Leaderboard({ levels, onBack }: { levels: Level[]; onBack: () => void }
       </article>
       <aside className="qr-box game-card stack" style={{ alignItems: "center" }}>
         <div style={{ background: "#fff", padding: "8px", borderRadius: "8px", display: "inline-block" }}>
-          <QRCode value={window.location.origin} size={120} />
+          <QRCode value="https://mobile-puzzle-3x3.pages.dev/" size={120} />
         </div>
         <b style={{ textAlign: "center" }}>Quét QR tham gia đường<br/>đua ngay</b>
         {window.location.hostname === "localhost" && <small style={{ color: "red", textAlign: "center", fontSize: "12px", marginTop: "4px" }}>Vui lòng mở web bằng IP LAN (vd: 192.168.x.x) để ĐT có thể quét được!</small>}
