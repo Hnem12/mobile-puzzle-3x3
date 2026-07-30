@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Bell, ChevronLeft, Download, Pause, Play, RotateCcw, Upload, X, Zap, User, Phone, MapPin, Store, Scan } from "lucide-react";
-import racingBg from "./assets/Background.png";
+import racingBg from "./assets/form-bg.png";
 import logoMove from "./assets/logo-move.png";
 import logoKingsport from "./assets/logo-kingsport.png";
 import imgTop1 from "./assets/top1.png";
