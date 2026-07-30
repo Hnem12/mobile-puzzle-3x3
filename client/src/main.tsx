@@ -38,7 +38,7 @@ function Game() {
         const imgs = b.images && b.images.length > 0 ? b.images : (b.image ? [b.image] : []);
         setImage(imgs.length > 0 ? imgs[Math.floor(Math.random() * imgs.length)] : null);
         if (b.levels) {
-          const order: any = { "Easy": 1, "Medium": 2, "Hard": 3 };
+          const order: any = { "Easy": 1 };
           b.levels.sort((a: Level, b: Level) => (order[a.name] || 99) - (order[b.name] || 99));
         }
         setBoot(b);
@@ -56,9 +56,9 @@ function Game() {
           window.history.pushState({ trapped: true }, "", window.location.href);
         } else {
           window.removeEventListener("popstate", handlePopState);
+          window.removeEventListener("popstate", handlePopState);
           setLeaderboard(true);
           setUser(null);
-          setLevel(null);
           setResult(null);
         }
       }
@@ -77,10 +77,9 @@ function Game() {
   if (bootError) return <main className="game-hero"><section className="phone-panel"><h1>Lỗi kết nối</h1><p>{bootError}</p></section></main>;
   if (!boot) return <main className="game-hero"><section className="phone-panel"><h1>Đang tải...</h1></section></main>;
   if (leaderboard) return <Leaderboard levels={boot.levels} onBack={() => setLeaderboard(false)} />;
-  if (result && level) return <Result result={result} level={level} onReplay={() => { setLevel(null); setResult(null); }} onLeaderboard={() => setLeaderboard(true)} />;
+  if (result) return <Result result={result} level={boot.levels[0]} onReplay={() => setResult(null)} onLeaderboard={() => setLeaderboard(true)} onLogout={() => setUser(null)} />;
   if (!user) return <Register onDone={u => setUser(u)} disabled={!boot.settings.gameStatus} />;
-  if (!level) return <LevelSelect levels={boot.levels} onPick={setLevel} onLogout={() => setUser(null)} />;
-  return <Puzzle user={user} level={level} image={image} onDone={setResult} />;
+  return <Puzzle user={user} level={boot.levels[0]} image={image} onDone={setResult} onLogout={() => setUser(null)} />;
 }
 
 function Register({ onDone, disabled }: { onDone: (u: any) => void; disabled: boolean }) {
@@ -100,7 +99,7 @@ function Register({ onDone, disabled }: { onDone: (u: any) => void; disabled: bo
       setError("Không kết nối được backend, chưa thể lưu người chơi");
     }
   }
-  return <main className="game-hero"><section className="phone-panel">
+  return <main className="game-hero puzzle-hero"><section className="phone-panel">
     <BrandHeader />
     <h1>Đăng ký tham gia</h1>
     <form onSubmit={submit} className="game-card stack red-glow">
@@ -127,19 +126,7 @@ function Register({ onDone, disabled }: { onDone: (u: any) => void; disabled: bo
   </section></main>;
 }
 
-function LevelSelect({ levels, onPick, onLogout }: { levels: Level[]; onPick: (l: Level) => void; onLogout: () => void }) {
-  return <main className="game-hero"><section className="phone-panel">
-    <BrandHeader />
-    <button type="button" onClick={onLogout} style={{ position: 'absolute', top: 20, right: 20, background: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer', zIndex: 10 }}>Đổi người chơi</button>
-    <h1>Move to be king</h1>
-    <p className="subtitle">The fastest hand</p>
-    <div className="game-card stack">{levels.map((l, index) => <button className="level-card" key={l._id} onClick={() => onPick(l)}>
-      <strong>{l.name}</strong><span>{l.timeLimit}s</span><span>{l.maxScore} F-Point</span>
-    </button>)}</div>
-  </section></main>;
-}
-
-function Puzzle({ user, level, image, onDone }: { user: any; level: Level; image: GameImage | null; onDone: (r: any) => void }) {
+function Puzzle({ user, level, image, onDone, onLogout }: { user: any; level: Level; image: GameImage | null; onDone: (r: any) => void; onLogout: () => void }) {
   const solved = [1, 2, 3, 4, 5, 6, 7, 8, 0];
   const [tiles, setTiles] = useState<number[]>(() => shuffleSolvable(solved));
   const [moves, setMoves] = useState(0);
@@ -187,7 +174,7 @@ function Puzzle({ user, level, image, onDone }: { user: any; level: Level; image
   </main>;
 }
 
-function Result({ result, level, onReplay, onLeaderboard }: { result: any; level: Level; onReplay: () => void; onLeaderboard: () => void }) {
+function Result({ result, level, onReplay, onLeaderboard, onLogout }: { result: any; level: Level; onReplay: () => void; onLeaderboard: () => void; onLogout: () => void }) {
   const [rows, setRows] = useState<any[]>([]);
   useEffect(() => { 
     fetch(`${API}/game/leaderboard`)
@@ -197,8 +184,6 @@ function Result({ result, level, onReplay, onLeaderboard }: { result: any; level
       })
       .then((data: any[]) => {
         const levelPriority: Record<string, number> = {
-          Hard: 3,
-          Medium: 2,
           Easy: 1
         };
 
@@ -230,6 +215,7 @@ function Result({ result, level, onReplay, onLeaderboard }: { result: any; level
   const currentRank = currentIndex >= 0 ? currentIndex + 1 : null;
   const rest = rankedRows.slice(3, 5);
   return <main className="game-hero result-hero"><section className="phone-panel result">
+    <button type="button" onClick={onLogout} style={{ position: 'absolute', top: 20, right: 20, background: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer', zIndex: 10 }}>Đổi người chơi</button>
     <div className="confetti" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /></div>
     <BrandHeader />
     <h1>{result.result === "WIN" ? "HOÀN THÀNH THỬ THÁCH" : "HẾT THỜI GIAN"}</h1>
@@ -261,8 +247,7 @@ function Leaderboard({ levels, onBack }: { levels: Level[]; onBack: () => void }
       })
       .then((data: any[]) => {
         const levelPriority: Record<string, number> = {
-          Hard: 3,
-          Medium: 2,
+ 
           Easy: 1
         };
 
@@ -452,8 +437,6 @@ function History() {
         if (!Array.isArray(data)) return setRows([]);
         
         const levelPriority: Record<string, number> = {
-          Hard: 3,
-          Medium: 2,
           Easy: 1
         };
 
@@ -499,31 +482,17 @@ function Settings() {
   useEffect(() => { fetch(`${API}/admin/levels`, { headers: auth() }).then(r => {
     if (r.status === 401) { localStorage.removeItem("adminToken"); window.location.reload(); return []; }
     return r.ok ? r.json() : [];
-  }).then(data => setLevels(Array.isArray(data) ? data.sort((a: Level, b: Level) => {
-    const order: any = { "Easy": 1, "Medium": 2, "Hard": 3 };
-    return (order[a.name] || 99) - (order[b.name] || 99);
-  }) : [])); }, []);
+  }).then(data => setLevels(Array.isArray(data) ? data : [])); }, []);
+  
   function patch(i: number, data: Partial<Level>) { setLevels(v => v.map((l, ix) => ix === i ? { ...l, ...data } : l)); }
+  
   async function saveLevel(i: number) {
     const current = levels[i];
-    if (i === 0 && levels[1]) {
-      if (current.timeLimit <= levels[1].timeLimit) return alert("Thời gian Cấp 1 phải LỚN HƠN Cấp 2");
-      if (current.maxScore >= levels[1].maxScore) return alert("Điểm tối đa Cấp 1 phải NHỎ HƠN Cấp 2");
-    }
-    if (i === 1) {
-      if (levels[0] && current.timeLimit >= levels[0].timeLimit) return alert("Thời gian Cấp 2 phải NHỎ HƠN Cấp 1");
-      if (levels[2] && current.timeLimit <= levels[2].timeLimit) return alert("Thời gian Cấp 2 phải LỚN HƠN Cấp 3");
-      if (levels[0] && current.maxScore <= levels[0].maxScore) return alert("Điểm tối đa Cấp 2 phải LỚN HƠN Cấp 1");
-      if (levels[2] && current.maxScore >= levels[2].maxScore) return alert("Điểm tối đa Cấp 2 phải NHỎ HƠN Cấp 3");
-    }
-    if (i === 2 && levels[1]) {
-      if (current.timeLimit >= levels[1].timeLimit) return alert("Thời gian Cấp 3 phải NHỎ HƠN Cấp 2");
-      if (current.maxScore <= levels[1].maxScore) return alert("Điểm tối đa Cấp 3 phải LỚN HƠN Cấp 2");
-    }
     await fetch(`${API}/admin/levels/${current._id}`, { method: "PUT", headers: { ...auth(), "Content-Type": "application/json" }, body: JSON.stringify(current) });
-    alert(`Lưu Cấp ${i + 1} thành công!`);
+    alert(`Lưu cấu hình thành công!`);
   }
-  return <section><h1>Cấu hình Game</h1><div className="level-grid">{levels.map((l, i) => <article className="config-card" key={l._id}><h3>Cấp {i + 1} <span>3x3</span></h3><label>Thời gian (giây)<input type="number" value={l.timeLimit} onChange={e => patch(i, { timeLimit: +e.target.value })} /></label><label>Điểm tối đa<input type="number" value={l.maxScore} onChange={e => patch(i, { maxScore: +e.target.value })} /></label><button onClick={() => saveLevel(i)}>Lưu cấp {i + 1}</button></article>)}</div></section>;
+  
+  return <section><h1>Cấu hình Game</h1><div className="level-grid">{levels.map((l, i) => <article className="config-card" key={l._id}><h3>Mức độ mặc định <span>3x3</span></h3><label>Thời gian (giây)<input type="number" value={l.timeLimit} onChange={e => patch(i, { timeLimit: +e.target.value })} /></label><label>Điểm tối đa<input type="number" value={l.maxScore} onChange={e => patch(i, { maxScore: +e.target.value })} /></label><button onClick={() => saveLevel(i)}>Lưu cấu hình</button></article>)}</div></section>;
 }
 
 function shuffleSolvable(solved: number[]): number[] {

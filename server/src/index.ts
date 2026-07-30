@@ -29,29 +29,37 @@ const upload = multer({
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || (process.env.CLIENT_ORIGIN && process.env.CLIENT_ORIGIN === "*")) {
+      if (
+        !origin ||
+        (process.env.CLIENT_ORIGIN && process.env.CLIENT_ORIGIN === "*")
+      ) {
         return callback(null, true);
       }
       const allowedOrigins = [
         "https://mobile-puzzle-3x3-production.up.railway.app",
         "http://localhost:5173",
-        ...(process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.split(",") : []),
+        ...(process.env.CLIENT_ORIGIN
+          ? process.env.CLIENT_ORIGIN.split(",")
+          : []),
       ];
-      if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes("*")) {
+      if (
+        allowedOrigins.indexOf(origin) !== -1 ||
+        allowedOrigins.includes("*")
+      ) {
         callback(null, true);
       } else {
         callback(null, true); // Temporarily allow all for easier debugging during setup
       }
     },
     credentials: true,
-  })
+  }),
 );
 
 app.get("/", (req, res) => {
-    res.json({
-        success: true,
-        message: "Puzzle Backend Running"
-    });
+  res.json({
+    success: true,
+    message: "Puzzle Backend Running",
+  });
 });
 
 app.use(express.json());
@@ -224,7 +232,9 @@ app.post("/api/game/histories", async (req, res) => {
     !settings.allowMultiplePlay &&
     (await GameHistory.exists({ userId: parsed.data.userId }))
   ) {
-    return res.status(409).json({ message: "Tài khoản này đã ghi nhận kết quả trò chơi" });
+    return res
+      .status(409)
+      .json({ message: "Tài khoản này đã ghi nhận kết quả trò chơi" });
   }
 
   res.status(201).json(await GameHistory.create(parsed.data));
@@ -296,15 +306,11 @@ async function leaderboard(levelId?: string) {
       $addFields: {
         levelPriority: {
           $switch: {
-            branches: [
-              { case: { $eq: ["$level.name", "Hard"] }, then: 3 },
-              { case: { $eq: ["$level.name", "Medium"] }, then: 2 },
-              { case: { $eq: ["$level.name", "Easy"] }, then: 1 }
-            ],
-            default: 0
-          }
-        }
-      }
+            branches: [{ case: { $eq: ["$level.name", "Easy"] }, then: 1 }],
+            default: 0,
+          },
+        },
+      },
     },
     { $sort: { levelPriority: -1, score: -1, duration: 1, moves: 1 } },
     {
@@ -339,16 +345,14 @@ async function leaderboard(levelId?: string) {
         bestDuration: 1,
         moves: 1,
         levelName: 1,
-        levelPriority: 1
+        levelPriority: 1,
       },
     },
   ]);
 }
 
-mongoose
-  .connect(process.env.MONGO_URI as string)
-  .then(() => {
-    app.listen(port, () =>
-      console.log(`API running on http://localhost:${port}`),
-    );
-  });
+mongoose.connect(process.env.MONGO_URI as string).then(() => {
+  app.listen(port, () =>
+    console.log(`API running on http://localhost:${port}`),
+  );
+});
