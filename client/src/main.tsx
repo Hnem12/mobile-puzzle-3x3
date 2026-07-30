@@ -80,6 +80,7 @@ function Game() {
 
   const activeLevel = boot.levels[0];
 
+  if (leaderboard) return <Leaderboard levels={[activeLevel]} onBack={() => setLeaderboard(false)} />;
   if (result) return <Result result={result} level={activeLevel} onReplay={() => setResult(null)} onLeaderboard={() => setLeaderboard(true)} onLogout={() => setUser(null)} />;
   if (!user) return <Register onDone={u => setUser(u)} disabled={!boot.settings.gameStatus} />;
   return <Puzzle user={user} level={activeLevel} image={image} onDone={setResult} onLogout={() => setUser(null)} />;
@@ -187,23 +188,12 @@ function Result({ result, level, onReplay, onLeaderboard, onLogout }: { result: 
         return r.json(); 
       })
       .then((data: any[]) => {
-        const levelPriority: Record<string, number> = {
-          Easy: 1
-        };
-
         const sorted = [...data].sort((a, b) => {
-          const aLevel = a.levelName || a.levelId?.name || "Easy";
-          const bLevel = b.levelName || b.levelId?.name || "Easy";
-          
-          const levelDiff = (levelPriority[bLevel] || 0) - (levelPriority[aLevel] || 0);
-          if (levelDiff !== 0) return levelDiff;
-          
           const aScore = a.bestScore ?? 0;
           const bScore = b.bestScore ?? 0;
           if (bScore !== aScore) {
             return bScore - aScore;
           }
-
           return (a.bestDuration ?? 0) - (b.bestDuration ?? 0);
         });
 
@@ -250,24 +240,12 @@ function Leaderboard({ levels, onBack }: { levels: Level[]; onBack: () => void }
         return r.json(); 
       })
       .then((data: any[]) => {
-        const levelPriority: Record<string, number> = {
- 
-          Easy: 1
-        };
-
         const sorted = [...data].sort((a, b) => {
-          const aLevel = a.levelName || a.levelId?.name || "Easy";
-          const bLevel = b.levelName || b.levelId?.name || "Easy";
-          
-          const levelDiff = (levelPriority[bLevel] || 0) - (levelPriority[aLevel] || 0);
-          if (levelDiff !== 0) return levelDiff;
-          
           const aScore = a.bestScore ?? 0;
           const bScore = b.bestScore ?? 0;
           if (bScore !== aScore) {
             return bScore - aScore;
           }
-
           return (a.bestDuration ?? 0) - (b.bestDuration ?? 0);
         });
 
@@ -440,20 +418,10 @@ function History() {
       .then(data => {
         if (!Array.isArray(data)) return setRows([]);
         
-        const levelPriority: Record<string, number> = {
-          Easy: 1
-        };
-
         const sorted = [...data].sort((a, b) => {
           if (a.result !== b.result) {
             return a.result === "WIN" ? -1 : 1;
           }
-
-          const aLevel = a.levelName || a.levelId?.name || "Easy";
-          const bLevel = b.levelName || b.levelId?.name || "Easy";
-          
-          const levelDiff = (levelPriority[bLevel] || 0) - (levelPriority[aLevel] || 0);
-          if (levelDiff !== 0) return levelDiff;
           
           const aScore = a.score ?? a.bestScore ?? 0;
           const bScore = b.score ?? b.bestScore ?? 0;
