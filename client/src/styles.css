@@ -8,6 +8,12 @@ body { margin: 0; }
 body:has(.game-hero), body:has(.play-screen), body:has(.result-hero) {
   background-color: #050609;
 }
+body:has(.admin), body:has(.login-container) {
+  background-image: url('./assets/racing-city-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
 button, input, select { font: inherit; }
 button, .button {
   align-items: center;
@@ -656,7 +662,7 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #f5f6f8;
+  background: transparent;
   padding: 24px;
 }
 .login-card {
