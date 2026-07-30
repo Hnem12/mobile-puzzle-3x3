@@ -201,8 +201,8 @@ app.post("/api/game/histories", async (req, res) => {
 
   res.status(201).json(await GameHistory.create(parsed.data));
 });
-app.get("/api/game/leaderboard", async (_req, res) =>
-  res.json(await leaderboard()),
+app.get("/api/game/leaderboard", async (req, res) =>
+  res.json(await leaderboard(req.query.levelId as string)),
 );
 
 async function getSettings() {
@@ -249,18 +249,23 @@ function formatHistory(row: any) {
   };
 }
 
-async function leaderboard() {
+async function leaderboard(levelId?: string) {
+  const match: any = { result: "WIN" };
+  if (levelId) match.levelId = new mongoose.Types.ObjectId(levelId);
+
   return GameHistory.aggregate([
-    { $match: { result: "WIN" } },
+    { $match: match },
+    { $sort: { duration: 1, score: -1, moves: 1 } },
     {
       $group: {
         _id: "$userId",
-        score: { $max: "$score" },
+        bestDuration: { $first: "$duration" },
+        score: { $first: "$score" },
+        moves: { $first: "$moves" },
         plays: { $sum: 1 },
-        bestDuration: { $min: "$duration" },
       },
     },
-    { $sort: { score: -1, bestDuration: 1 } },
+    { $sort: { bestDuration: 1, score: -1, moves: 1 } },
     { $limit: 10 },
     {
       $lookup: {
@@ -279,6 +284,7 @@ async function leaderboard() {
         score: 1,
         plays: 1,
         bestDuration: 1,
+        moves: 1,
       },
     },
   ]);

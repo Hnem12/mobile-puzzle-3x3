@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Bell, ChevronLeft, Download, Pause, RotateCcw, Upload, X, Zap, User, Phone, MapPin, Store, Scan } from "lucide-react";
+import { Bell, ChevronLeft, Download, Pause, Play, RotateCcw, Upload, X, Zap, User, Phone, MapPin, Store, Scan } from "lucide-react";
 import racingBg from "./assets/Background.png";
 import logoMove from "./assets/logo-move.png";
 import logoKingsport from "./assets/logo-kingsport.png";
@@ -26,7 +26,12 @@ function App() {
 function Game() {
   const [boot, setBoot] = useState<Bootstrap | null>(null);
   const [image, setImage] = useState<GameImage | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>(() => {
+    try {
+      const saved = localStorage.getItem("gameUser");
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
   const [level, setLevel] = useState<Level | null>(null);
   const [result, setResult] = useState<any>(null);
   const [leaderboard, setLeaderboard] = useState(false);
@@ -37,17 +42,46 @@ function Game() {
       .then(b => {
         const imgs = b.images && b.images.length > 0 ? b.images : (b.image ? [b.image] : []);
         setImage(imgs.length > 0 ? imgs[Math.floor(Math.random() * imgs.length)] : null);
+        if (b.levels) {
+          const order: any = { "Easy": 1, "Medium": 2, "Hard": 3 };
+          b.levels.sort((a: Level, b: Level) => (order[a.name] || 99) - (order[b.name] || 99));
+        }
         setBoot(b);
       })
       .catch(() => setBootError("Không kết nối được backend. Vui lòng kiểm tra server Mongo/API."));
   }, []);
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (user) { e.preventDefault(); e.returnValue = ""; }
+    };
+    const handlePopState = () => {
+      if (user) {
+        if (!window.confirm("Bạn có chắc chắn muốn thoát khỏi trò chơi? Tiến trình hiện tại sẽ không được lưu.")) {
+          window.history.pushState({ trapped: true }, "", window.location.href);
+        } else {
+          window.removeEventListener("popstate", handlePopState);
+          window.history.back();
+        }
+      }
+    };
+    if (user) {
+      if (!window.history.state?.trapped) window.history.pushState({ trapped: true }, "", window.location.href);
+      window.addEventListener("popstate", handlePopState);
+      window.addEventListener("beforeunload", handleBeforeUnload);
+    }
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [user]);
+
   if (bootError) return <main className="game-hero"><section className="phone-panel"><h1>Lỗi kết nối</h1><p>{bootError}</p></section></main>;
   if (!boot) return <main className="game-hero"><section className="phone-panel"><h1>Đang tải...</h1></section></main>;
-  if (leaderboard) return <Leaderboard onBack={() => setLeaderboard(false)} />;
-  if (result) return <Result result={result} onReplay={() => { setLevel(null); setResult(null); }} onLeaderboard={() => setLeaderboard(true)} />;
-  if (!user) return <Register onDone={setUser} disabled={!boot.settings.gameStatus} />;
-  if (!level) return <LevelSelect levels={boot.levels} onPick={setLevel} />;
+  if (leaderboard) return <Leaderboard levels={boot.levels} onBack={() => setLeaderboard(false)} />;
+  if (result && level) return <Result result={result} level={level} onReplay={() => { setLevel(null); setResult(null); }} onLeaderboard={() => setLeaderboard(true)} />;
+  if (!user) return <Register onDone={u => { setUser(u); localStorage.setItem("gameUser", JSON.stringify(u)); }} disabled={!boot.settings.gameStatus} />;
+  if (!level) return <LevelSelect levels={boot.levels} onPick={setLevel} onLogout={() => { localStorage.removeItem("gameUser"); setUser(null); }} />;
   return <Puzzle user={user} level={level} image={image} onDone={setResult} />;
 }
 
@@ -73,7 +107,7 @@ function Register({ onDone, disabled }: { onDone: (u: any) => void; disabled: bo
     <h1>Đăng ký tham gia</h1>
     <form onSubmit={submit} className="game-card stack red-glow">
       <label><span className="label-with-icon"><User size={14} /> HỌ VÀ TÊN *</span><input required placeholder="Nhập họ và tên..." value={fullName} onChange={e => setFullName(e.target.value)} /></label>
-      <label><span className="label-with-icon"><Phone size={14} /> SỐ ĐIỆN THOẠI *</span><input required placeholder="Nhập số điện thoại..." value={phone} onChange={e => setPhone(e.target.value)} /></label>
+      <label><span className="label-with-icon"><Phone size={14} /> SỐ ĐIỆN THOẠI *</span><input required type="tel" pattern="[0-9]{10}" maxLength={10} title="Số điện thoại phải gồm đúng 10 chữ số" placeholder="Nhập số điện thoại..." value={phone} onChange={e => setPhone(e.target.value.replace(/\D/g, ''))} /></label>
       <label><span className="label-with-icon"><MapPin size={14} /> ĐỊA CHỈ</span><input placeholder="Nhập địa chỉ hiện tại..." value={address} onChange={e => setAddress(e.target.value)} /></label>
       
       <div className="radio-group-label">NHU CẦU MUA SẮM</div>
@@ -95,13 +129,14 @@ function Register({ onDone, disabled }: { onDone: (u: any) => void; disabled: bo
   </section></main>;
 }
 
-function LevelSelect({ levels, onPick }: { levels: Level[]; onPick: (l: Level) => void }) {
+function LevelSelect({ levels, onPick, onLogout }: { levels: Level[]; onPick: (l: Level) => void; onLogout: () => void }) {
   return <main className="game-hero"><section className="phone-panel">
     <BrandHeader />
+    <button type="button" onClick={onLogout} style={{ position: 'absolute', top: 20, right: 20, background: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer', zIndex: 10 }}>Đổi người chơi</button>
     <h1>Move to be king</h1>
     <p className="subtitle">The fastest hand</p>
     <div className="game-card stack">{levels.map((l, index) => <button className="level-card" key={l._id} onClick={() => onPick(l)}>
-      <strong>{["Easy", "Medium", "Hard"][index] || l.name}</strong><span>{l.timeLimit}s</span><span>{l.maxScore} F-Point</span>
+      <strong>{l.name}</strong><span>{l.timeLimit}s</span><span>{l.maxScore} F-Point</span>
     </button>)}</div>
   </section></main>;
 }
@@ -143,7 +178,7 @@ function Puzzle({ user, level, image, onDone }: { user: any; level: Level; image
     [next[i], next[blank]] = [next[blank], next[i]];
     setTiles(next); setMoves(m => m + 1);
   }
-  return <main className="play-screen" style={{ backgroundImage: `url(${formBg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+  return <main className="play-screen" style={{ "--racing-bg": `url(${formBg})` } as React.CSSProperties}>
     <BrandHeader />
     <header><strong>Ảnh mẫu</strong><span>{left.toFixed(2)}s</span></header>
     <div className="progress"><i style={{ width: `${(left / level.timeLimit) * 100}%` }} /></div>
@@ -154,9 +189,9 @@ function Puzzle({ user, level, image, onDone }: { user: any; level: Level; image
   </main>;
 }
 
-function Result({ result, onReplay, onLeaderboard }: { result: any; onReplay: () => void; onLeaderboard: () => void }) {
+function Result({ result, level, onReplay, onLeaderboard }: { result: any; level: Level; onReplay: () => void; onLeaderboard: () => void }) {
   const [rows, setRows] = useState<any[]>([]);
-  useEffect(() => { fetch(`${API}/game/leaderboard`).then(r => { if (!r.ok) throw new Error("Cannot load leaderboard"); return r.json(); }).then(setRows).catch(() => setRows([])); }, []);
+  useEffect(() => { fetch(`${API}/game/leaderboard?levelId=${level._id}`).then(r => { if (!r.ok) throw new Error("Cannot load leaderboard"); return r.json(); }).then(setRows).catch(() => setRows([])); }, []);
   const fallbackCurrent = result.user ? { fullName: result.user.fullName, phone: result.user.phone, bestDuration: result.duration, score: result.score } : null;
   const rankedRows = rows.length ? rows : fallbackCurrent ? [fallbackCurrent] : [];
   const podium = [rankedRows[1], rankedRows[0], rankedRows[2]];
@@ -170,7 +205,7 @@ function Result({ result, onReplay, onLeaderboard }: { result: any; onReplay: ()
     <p className="muted-label">Thời gian của bạn</p>
     <strong className="time-result">{formatTime(result.duration)}</strong>
     <b className="winner-copy">Thật tuyệt vời</b>
-    <p className="result-copy">{currentRank ? currentRank <= 3 ? <>Bạn đang ở <b>Top {currentRank}</b> của MOVE to be KING.</> : <>Bạn đang ở <b>hạng {currentRank}</b> trên BXH MOVE to be KING.</> : <>Kết quả của bạn đã được ghi nhận và BXH đang cập nhật.</>} Liên tục cập nhật BXH để theo dõi cơ hội nhận <b>01 chiếc xe máy điện Athena.</b></p>
+    <p className="result-copy">{currentRank ? currentRank <= 3 ? <>Bạn đang ở <b>Top {currentRank}</b> chế độ <b>{level.name}</b>.</> : <>Bạn đang ở <b>hạng {currentRank}</b> chế độ <b>{level.name}</b>.</> : <>Kết quả của bạn đã được ghi nhận và BXH đang cập nhật.</>} Liên tục cập nhật BXH để theo dõi cơ hội nhận <b>01 chiếc xe máy điện Athena.</b></p>
     <div className="top-board result-board">
       {["TOP 2", "TOP 1", "TOP 3"].map((label, i) => <article className={`top-card top-${i + 1}`} key={label}>
         <div className="prize-orb"><img src={[imgTop2, imgTop1, imgTop3][i]} alt={label} /></div>
@@ -185,9 +220,13 @@ function Result({ result, onReplay, onLeaderboard }: { result: any; onReplay: ()
     <button className="primary-red notify" onClick={onLeaderboard}><Bell size={16} /> THEO DÕI BẢNG XẾP HẠNG QUA ZALO NGAY</button>
   </section></main>;
 }
-function Leaderboard({ onBack }: { onBack: () => void }) {
+function Leaderboard({ levels, onBack }: { levels: Level[]; onBack: () => void }) {
+  const [activeLevel, setActiveLevel] = useState(levels[0]?._id);
   const [rows, setRows] = useState<any[]>([]);
-  useEffect(() => { fetch(`${API}/game/leaderboard`).then(r => { if (!r.ok) throw new Error("Cannot load leaderboard"); return r.json(); }).then(setRows).catch(() => setRows([])); }, []);
+  useEffect(() => { 
+    if (!activeLevel) return;
+    fetch(`${API}/game/leaderboard?levelId=${activeLevel}`).then(r => { if (!r.ok) throw new Error("Cannot load leaderboard"); return r.json(); }).then(setRows).catch(() => setRows([])); 
+  }, [activeLevel]);
   const podium = [rows[1], rows[0], rows[2]];
   const podiumLabels = ["TOP 2", "TOP 1", "TOP 3"];
   const products = ["MOVE", "KING", "PLUS"];
@@ -197,6 +236,9 @@ function Leaderboard({ onBack }: { onBack: () => void }) {
     <BrandHeader />
     <div className="leaderboard-header-title">
       <h1><span className="bolt"><Zap size={22} fill="currentColor" /></span> Move to be king</h1>
+      <div className="level-tabs">
+        {levels.map(l => <button key={l._id} className={activeLevel === l._id ? "active" : ""} onClick={() => setActiveLevel(l._id)}>{l.name}</button>)}
+      </div>
       <p className="subtitle">The faster hand</p>
     </div>
     <div className="top-board">{podium.map((row, i) => <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
@@ -247,7 +289,11 @@ function Admin() {
   const [tab, setTab] = useState("images");
   if (!token) return <Login onDone={setToken} />;
   return <main className="admin">
-    <nav><button onClick={() => setTab("images")}>Hình ảnh</button><button onClick={() => setTab("history")}>Lịch sử chơi</button><button onClick={() => setTab("settings")}>Cấu hình Game</button></nav>
+    <nav className="admin-nav">
+      <button className={tab === "images" ? "active" : ""} onClick={() => setTab("images")}>Hình ảnh</button>
+      <button className={tab === "history" ? "active" : ""} onClick={() => setTab("history")}>Lịch sử chơi</button>
+      <button className={tab === "settings" ? "active" : ""} onClick={() => setTab("settings")}>Cấu hình Game</button>
+    </nav>
     {tab === "images" && <Images />}
     {tab === "history" && <History />}
     {tab === "settings" && <Settings />}
@@ -262,15 +308,21 @@ function Login({ onDone }: { onDone: (t: string) => void }) {
 
 function Images() {
   const [images, setImages] = useState<GameImage[]>([]); const [file, setFile] = useState<File | null>(null);
-  const load = () => fetch(`${API}/admin/images`, { headers: auth() }).then(r => r.json()).then(setImages);
+  const load = () => fetch(`${API}/admin/images`, { headers: auth() }).then(r => {
+    if (r.status === 401) { localStorage.removeItem("adminToken"); window.location.reload(); return []; }
+    return r.ok ? r.json() : [];
+  }).then(data => setImages(Array.isArray(data) ? data : []));
   useEffect(() => { void load(); }, []);
   async function upload() { if (!file) return; const f = new FormData(); f.append("image", file); f.append("name", file.name); f.append("gridSize", "3"); await fetch(`${API}/admin/images`, { method: "POST", headers: auth(), body: f }); setFile(null); load(); }
-  return <section><h1>Hình ảnh</h1><div className="admin-card"><h3>Upload ảnh mới</h3><input type="file" accept="image/*" onChange={e => setFile(e.target.files?.[0] || null)} /><button onClick={upload}><Upload size={18} /> Upload</button></div><table><thead><tr><th>Xem trước</th><th>Lưới</th><th>Trạng thái</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead><tbody>{images.map(img => <tr key={img._id}><td><img className="thumb" src={img.imageUrl} /></td><td><span className="pill">3x3</span></td><td><span className={img.status === "ACTIVE" ? "ok" : "bad"}>{img.status === "ACTIVE" ? "Hoạt động" : "Tạm dừng"}</span></td><td>{img.createdAt?.slice(0, 10)}</td><td><button onClick={() => fetch(`${API}/admin/images/${img._id}/status`, { method: "PATCH", headers: { ...auth(), "Content-Type": "application/json" }, body: JSON.stringify({ status: img.status === "ACTIVE" ? "INACTIVE" : "ACTIVE" }) }).then(load)}><Pause size={16} /> Tạm ngưng</button><button className="danger" onClick={() => fetch(`${API}/admin/images/${img._id}`, { method: "DELETE", headers: auth() }).then(load)}><X size={16} /> Xóa</button></td></tr>)}</tbody></table></section>;
+  return <section><h1>Hình ảnh</h1><div className="admin-card compact-upload"><h3>Upload ảnh mới</h3><div className="upload-row"><label className="file-label"><input type="file" accept="image/*" onChange={e => setFile(e.target.files?.[0] || null)} style={{display: "none"}} /><span className="file-name">{file ? file.name : "Nhấn để chọn ảnh từ máy..."}</span></label><button onClick={upload} disabled={!file} className={file ? "btn-upload-ready" : ""}><Upload size={16} /> Tải lên</button></div></div><table><thead><tr><th>Xem trước</th><th>Lưới</th><th>Trạng thái</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead><tbody>{images.map(img => <tr key={img._id}><td><img className="thumb" src={img.imageUrl} /></td><td><span className="pill">3x3</span></td><td><span className={img.status === "ACTIVE" ? "ok" : "bad"}>{img.status === "ACTIVE" ? "Hoạt động" : "Tạm dừng"}</span></td><td>{img.createdAt?.slice(0, 10)}</td><td><div className="action-buttons"><button onClick={() => fetch(`${API}/admin/images/${img._id}/status`, { method: "PATCH", headers: { ...auth(), "Content-Type": "application/json" }, body: JSON.stringify({ status: img.status === "ACTIVE" ? "INACTIVE" : "ACTIVE" }) }).then(load)}>{img.status === "ACTIVE" ? <><Pause size={14} /> Tạm ngưng</> : <><Play size={14} /> Kích hoạt</>}</button><button className="danger" onClick={() => fetch(`${API}/admin/images/${img._id}`, { method: "DELETE", headers: auth() }).then(load)}><X size={14} /> Xóa</button></div></td></tr>)}</tbody></table></section>;
 }
 
 function History() {
   const [rows, setRows] = useState<any[]>([]); const [q, setQ] = useState("");
-  useEffect(() => { fetch(`${API}/admin/histories?name=${q}`, { headers: auth() }).then(r => { if (!r.ok) throw new Error("Cannot load histories"); return r.json(); }).then(data => setRows(Array.isArray(data) ? data : [])).catch(() => setRows([])); }, [q]);
+  useEffect(() => { fetch(`${API}/admin/histories?name=${q}`, { headers: auth() }).then(r => {
+    if (r.status === 401) { localStorage.removeItem("adminToken"); window.location.reload(); return []; }
+    if (!r.ok) throw new Error("Cannot load histories"); return r.json(); 
+  }).then(data => setRows(Array.isArray(data) ? data : [])).catch(() => setRows([])); }, [q]);
   async function exportExcel() {
     const res = await fetch(`${API}/admin/histories/export?name=${q}`, { headers: auth() });
     if (!res.ok) return;
@@ -286,9 +338,34 @@ function History() {
 }
 function Settings() {
   const [levels, setLevels] = useState<Level[]>([]);
-  useEffect(() => { fetch(`${API}/admin/levels`, { headers: auth() }).then(r => r.json()).then(setLevels); }, []);
+  useEffect(() => { fetch(`${API}/admin/levels`, { headers: auth() }).then(r => {
+    if (r.status === 401) { localStorage.removeItem("adminToken"); window.location.reload(); return []; }
+    return r.ok ? r.json() : [];
+  }).then(data => setLevels(Array.isArray(data) ? data.sort((a: Level, b: Level) => {
+    const order: any = { "Easy": 1, "Medium": 2, "Hard": 3 };
+    return (order[a.name] || 99) - (order[b.name] || 99);
+  }) : [])); }, []);
   function patch(i: number, data: Partial<Level>) { setLevels(v => v.map((l, ix) => ix === i ? { ...l, ...data } : l)); }
-  return <section><h1>Cấu hình Game</h1><div className="level-grid">{levels.map((l, i) => <article className="config-card" key={l._id}><h3>Cấp {i + 1} <span>3x3</span></h3><label>Thời gian (giây)<input type="number" value={l.timeLimit} onChange={e => patch(i, { timeLimit: +e.target.value })} /></label><label>Điểm tối đa<input type="number" value={l.maxScore} onChange={e => patch(i, { maxScore: +e.target.value })} /></label><button onClick={() => fetch(`${API}/admin/levels/${l._id}`, { method: "PUT", headers: { ...auth(), "Content-Type": "application/json" }, body: JSON.stringify(l) })}>Lưu cấp {i + 1}</button></article>)}</div></section>;
+  async function saveLevel(i: number) {
+    const current = levels[i];
+    if (i === 0 && levels[1]) {
+      if (current.timeLimit <= levels[1].timeLimit) return alert("Thời gian Cấp 1 phải LỚN HƠN Cấp 2");
+      if (current.maxScore >= levels[1].maxScore) return alert("Điểm tối đa Cấp 1 phải NHỎ HƠN Cấp 2");
+    }
+    if (i === 1) {
+      if (levels[0] && current.timeLimit >= levels[0].timeLimit) return alert("Thời gian Cấp 2 phải NHỎ HƠN Cấp 1");
+      if (levels[2] && current.timeLimit <= levels[2].timeLimit) return alert("Thời gian Cấp 2 phải LỚN HƠN Cấp 3");
+      if (levels[0] && current.maxScore <= levels[0].maxScore) return alert("Điểm tối đa Cấp 2 phải LỚN HƠN Cấp 1");
+      if (levels[2] && current.maxScore >= levels[2].maxScore) return alert("Điểm tối đa Cấp 2 phải NHỎ HƠN Cấp 3");
+    }
+    if (i === 2 && levels[1]) {
+      if (current.timeLimit >= levels[1].timeLimit) return alert("Thời gian Cấp 3 phải NHỎ HƠN Cấp 2");
+      if (current.maxScore <= levels[1].maxScore) return alert("Điểm tối đa Cấp 3 phải LỚN HƠN Cấp 2");
+    }
+    await fetch(`${API}/admin/levels/${current._id}`, { method: "PUT", headers: { ...auth(), "Content-Type": "application/json" }, body: JSON.stringify(current) });
+    alert(`Lưu Cấp ${i + 1} thành công!`);
+  }
+  return <section><h1>Cấu hình Game</h1><div className="level-grid">{levels.map((l, i) => <article className="config-card" key={l._id}><h3>Cấp {i + 1} <span>3x3</span></h3><label>Thời gian (giây)<input type="number" value={l.timeLimit} onChange={e => patch(i, { timeLimit: +e.target.value })} /></label><label>Điểm tối đa<input type="number" value={l.maxScore} onChange={e => patch(i, { maxScore: +e.target.value })} /></label><button onClick={() => saveLevel(i)}>Lưu cấp {i + 1}</button></article>)}</div></section>;
 }
 
 function shuffleSolvable(solved: number[]): number[] {

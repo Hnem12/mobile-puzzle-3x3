@@ -301,11 +301,33 @@ input, select {
 .rank-list b { color: #ff5362; font-size: 12px; }
 .admin {
   display: grid;
-  gap: 22px;
-  padding: 28px 16px;
+  gap: 16px;
+  padding: 24px 16px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
-.admin nav { display: flex; flex-wrap: wrap; gap: 10px; }
-.admin h1 { margin: 0 0 24px; }
+.admin-nav { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 8px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 12px;
+}
+.admin-nav button {
+  background: transparent;
+  color: #64748b;
+  border-radius: 6px;
+  min-height: 36px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0 16px;
+}
+.admin-nav button:hover { background: #f1f5f9; }
+.admin-nav button.active {
+  background: #eff6ff;
+  color: #2563eb;
+}
+.admin h1 { font-size: 22px; margin: 0 0 16px; }
 .admin-card, .filters {
   align-items: end;
   background: white;
@@ -313,9 +335,53 @@ input, select {
   box-shadow: 0 1px 3px rgba(15, 23, 42, .08);
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 24px;
-  padding: 24px;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+}
+.filters {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.filters input {
+  flex: 1;
+  min-width: 0;
+}
+.compact-upload h3 { flex-basis: 100%; margin: 0 0 8px; font-size: 15px; }
+.upload-row { display: flex; gap: 12px; align-items: center; width: 100%; flex-wrap: wrap; }
+.file-label {
+  display: flex;
+  align-items: center;
+  border: 1px dashed #cbd4df;
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 0 16px;
+  min-height: 40px;
+  flex: 1;
+  cursor: pointer;
+  color: #64748b;
+  font-size: 13px;
+  transition: all 0.2s;
+  overflow: hidden;
+}
+.file-label:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+.file-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.btn-upload-ready {
+  background: #2563eb !important;
+  color: white !important;
+}
+.upload-row button {
+  min-height: 38px;
+  font-size: 13px;
+  padding: 0 16px;
 }
 .admin-card h3 { flex-basis: 100%; margin: 0; }
 table {
@@ -326,9 +392,9 @@ table {
   overflow: hidden;
   width: 100%;
 }
-th, td { border-bottom: 1px solid #edf0f4; padding: 16px 20px; text-align: left; white-space: nowrap; }
-th { background: #f8fafc; color: #4b5563; }
-.thumb { border-radius: 5px; height: 100px; object-fit: cover; width: 100px; }
+th, td { border-bottom: 1px solid #edf0f4; padding: 12px 16px; font-size: 14px; text-align: left; white-space: nowrap; }
+th { background: #f8fafc; color: #4b5563; font-weight: 600; }
+.thumb { border-radius: 6px; height: 64px; object-fit: cover; width: 64px; }
 .pill, .ok, .bad { border-radius: 999px; display: inline-flex; font-weight: 700; padding: 4px 12px; }
 .pill { background: #f1f3f6; }
 .ok { background: #d8fbe8; color: #008144; }
@@ -455,6 +521,10 @@ th { background: #f8fafc; color: #4b5563; }
 .rank-list.compact { background: linear-gradient(135deg, rgba(107, 30, 43, .98), rgba(67, 17, 27, .96)); border-radius: 8px; box-shadow: 0 18px 36px rgba(239,28,48,.18); padding: 12px; }
 .rank-list.compact p:last-child { background: rgba(255,38,58,.28); border-radius: 7px; }
 .reward-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-top: 16px; align-items: stretch; }
+.leaderboard-header-title .subtitle { color: #fedb70; font-size: 16px; margin-top: 4px; text-transform: uppercase; font-weight: 800; }
+.level-tabs { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
+.level-tabs button { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 6px 14px; min-height: auto; font-size: 13px; border-radius: 20px; }
+.level-tabs button.active { background: #fedb70; color: #d20c0c; border-color: #fedb70; }
 .rules-box h2 { color: #ef1c30; font-size: 14px; margin: 0 0 12px; text-transform: uppercase; font-weight: 800; }
 .rules-box p { font-size: 12px; color: rgba(255,255,255,.8); line-height: 1.4; margin: 0 0 12px; }
 .prize-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; font-size: 12px; font-weight: 700; color: #fff; }
@@ -561,8 +631,7 @@ th { background: #f8fafc; color: #4b5563; }
 }
 
 .phone-panel,
-.leaderboard-panel,
-.play-screen {
+.leaderboard-panel {
   background: transparent !important;
 }
 .brand-row {
