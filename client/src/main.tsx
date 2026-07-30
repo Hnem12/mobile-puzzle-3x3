@@ -8,6 +8,7 @@ import imgTop1 from "./assets/top1.png";
 import imgTop2 from "./assets/top2.png";
 import imgTop3 from "./assets/top3.png";
 import formBg from "./assets/form-bg.png";
+import resultBg from "./assets/result-bg.png";
 import "./styles.css";
 import QRCode from "react-qr-code";
 
@@ -233,7 +234,7 @@ function Result({ result, level, onReplay, onLeaderboard, onLogout }: { result: 
   const currentIndex = result.user?.phone ? rankedRows.findIndex(row => row.phone === result.user.phone) : -1;
   const currentRank = currentIndex >= 0 ? currentIndex + 1 : null;
   const rest = rankedRows.slice(3, 5);
-  return <main className="game-hero result-hero"><section className="phone-panel result">
+  return <main className="game-hero result-hero" style={{ "--result-bg": `url(${resultBg})` } as React.CSSProperties}><section className="phone-panel result">
     <button type="button" onClick={onLogout} style={{ position: 'absolute', top: 20, right: 20, background: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer', zIndex: 10 }}>Đổi người chơi</button>
     <div className="confetti" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /></div>
     <BrandHeader />

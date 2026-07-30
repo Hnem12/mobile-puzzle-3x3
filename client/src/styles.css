@@ -657,8 +657,7 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 
 /* Real provided background image. */
 .game-hero,
-.play-screen,
-.result-hero {
+.play-screen {
   background-image:
     linear-gradient(180deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,.16) 45%, rgba(0,0,0,.18) 100%),
     var(--racing-bg) !important;
@@ -666,13 +665,23 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
   background-position: center top, center top !important;
   background-repeat: no-repeat !important;
 }
+
+.result-hero {
+  background-image: var(--result-bg) !important;
+  background-size: 100% 100% !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+}
+
 .game-hero::before,
-.play-screen::before,
-.result-hero::before {
+.play-screen::before {
   background: linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.5)) !important;
   clip-path: none !important;
   opacity: .45 !important;
 }
+
+.result-hero::before { display: none !important; }
+
 .game-hero::after,
 .play-screen::after,
 .result-hero::after {
