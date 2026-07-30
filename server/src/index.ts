@@ -309,17 +309,7 @@ async function leaderboard(levelId?: string) {
       },
     },
     { $unwind: "$level" },
-    {
-      $addFields: {
-        levelPriority: {
-          $switch: {
-            branches: [{ case: { $eq: ["$level.name", "Easy"] }, then: 1 }],
-            default: 0,
-          },
-        },
-      },
-    },
-    { $sort: { levelPriority: -1, score: -1, duration: 1, moves: 1 } },
+    { $sort: { duration: 1, score: -1, moves: 1 } },
     {
       $group: {
         _id: "$userId",
@@ -327,11 +317,10 @@ async function leaderboard(levelId?: string) {
         score: { $first: "$score" },
         moves: { $first: "$moves" },
         levelName: { $first: "$level.name" },
-        levelPriority: { $first: "$levelPriority" },
         plays: { $sum: 1 },
       },
     },
-    { $sort: { levelPriority: -1, score: -1, bestDuration: 1, moves: 1 } },
+    { $sort: { bestDuration: 1, score: -1, moves: 1 } },
     { $limit: 10 },
     {
       $lookup: {
@@ -352,7 +341,6 @@ async function leaderboard(levelId?: string) {
         bestDuration: 1,
         moves: 1,
         levelName: 1,
-        levelPriority: 1,
       },
     },
   ]);

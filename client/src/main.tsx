@@ -189,12 +189,12 @@ function Result({ result, level, onReplay, onLeaderboard, onLogout }: { result: 
       })
       .then((data: any[]) => {
         const sorted = [...data].sort((a, b) => {
-          const aScore = a.bestScore ?? 0;
-          const bScore = b.bestScore ?? 0;
-          if (bScore !== aScore) {
-            return bScore - aScore;
+          const aDuration = a.bestDuration ?? Infinity;
+          const bDuration = b.bestDuration ?? Infinity;
+          if (aDuration !== bDuration) {
+            return aDuration - bDuration;
           }
-          return (a.bestDuration ?? 0) - (b.bestDuration ?? 0);
+          return (b.bestScore ?? 0) - (a.bestScore ?? 0);
         });
 
         setRows(sorted);
@@ -241,12 +241,12 @@ function Leaderboard({ levels, onBack }: { levels: Level[]; onBack: () => void }
       })
       .then((data: any[]) => {
         const sorted = [...data].sort((a, b) => {
-          const aScore = a.bestScore ?? 0;
-          const bScore = b.bestScore ?? 0;
-          if (bScore !== aScore) {
-            return bScore - aScore;
+          const aDuration = a.bestDuration ?? Infinity;
+          const bDuration = b.bestDuration ?? Infinity;
+          if (aDuration !== bDuration) {
+            return aDuration - bDuration;
           }
-          return (a.bestDuration ?? 0) - (b.bestDuration ?? 0);
+          return (b.bestScore ?? 0) - (a.bestScore ?? 0);
         });
 
         setRows(sorted);
@@ -423,13 +423,15 @@ function History() {
             return a.result === "WIN" ? -1 : 1;
           }
           
-          const aScore = a.score ?? a.bestScore ?? 0;
-          const bScore = b.score ?? b.bestScore ?? 0;
-          if (bScore !== aScore) {
-            return bScore - aScore;
+          const aDuration = a.duration ?? a.bestDuration ?? Infinity;
+          const bDuration = b.duration ?? b.bestDuration ?? Infinity;
+          if (aDuration !== bDuration) {
+            return aDuration - bDuration;
           }
 
-          return (a.duration ?? a.bestDuration ?? 0) - (b.duration ?? b.bestDuration ?? 0);
+          const aScore = a.score ?? a.bestScore ?? 0;
+          const bScore = b.score ?? b.bestScore ?? 0;
+          return bScore - aScore;
         });
 
         setRows(sorted);
