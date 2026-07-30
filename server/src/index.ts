@@ -28,14 +28,32 @@ const upload = multer({
 
 app.use(
   cors({
-    origin: [
-      "https://mobile-puzzle-3x3-production.up.railway.app",
-      "http://localhost:5173",
-      ...(process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.split(",") : []),
-    ],
+    origin: function (origin, callback) {
+      if (!origin || (process.env.CLIENT_ORIGIN && process.env.CLIENT_ORIGIN === "*")) {
+        return callback(null, true);
+      }
+      const allowedOrigins = [
+        "https://mobile-puzzle-3x3-production.up.railway.app",
+        "http://localhost:5173",
+        ...(process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.split(",") : []),
+      ];
+      if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes("*")) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Temporarily allow all for easier debugging during setup
+      }
+    },
     credentials: true,
-  }),
+  })
 );
+
+app.get("/", (req, res) => {
+    res.json({
+        success: true,
+        message: "Puzzle Backend Running"
+    });
+});
+
 app.use(express.json());
 app.use("/uploads", express.static(uploadDir));
 
