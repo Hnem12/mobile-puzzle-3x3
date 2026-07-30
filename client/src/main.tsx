@@ -26,12 +26,7 @@ function App() {
 function Game() {
   const [boot, setBoot] = useState<Bootstrap | null>(null);
   const [image, setImage] = useState<GameImage | null>(null);
-  const [user, setUser] = useState<any>(() => {
-    try {
-      const saved = localStorage.getItem("gameUser");
-      return saved ? JSON.parse(saved) : null;
-    } catch { return null; }
-  });
+  const [user, setUser] = useState<any>(null);
   const [level, setLevel] = useState<Level | null>(null);
   const [result, setResult] = useState<any>(null);
   const [leaderboard, setLeaderboard] = useState(false);
@@ -80,8 +75,8 @@ function Game() {
   if (!boot) return <main className="game-hero"><section className="phone-panel"><h1>Đang tải...</h1></section></main>;
   if (leaderboard) return <Leaderboard levels={boot.levels} onBack={() => setLeaderboard(false)} />;
   if (result && level) return <Result result={result} level={level} onReplay={() => { setLevel(null); setResult(null); }} onLeaderboard={() => setLeaderboard(true)} />;
-  if (!user) return <Register onDone={u => { setUser(u); localStorage.setItem("gameUser", JSON.stringify(u)); }} disabled={!boot.settings.gameStatus} />;
-  if (!level) return <LevelSelect levels={boot.levels} onPick={setLevel} onLogout={() => { localStorage.removeItem("gameUser"); setUser(null); }} />;
+  if (!user) return <Register onDone={u => setUser(u)} disabled={!boot.settings.gameStatus} />;
+  if (!level) return <LevelSelect levels={boot.levels} onPick={setLevel} onLogout={() => setUser(null)} />;
   return <Puzzle user={user} level={level} image={image} onDone={setResult} />;
 }
 
