@@ -251,7 +251,7 @@ function Result({ result, level, onReplay, onLeaderboard, onLogout }: { result: 
     <h1>{result.result === "WIN" ? "HOÀN THÀNH THỬ THÁCH" : "HẾT THỜI GIAN"}</h1>
     <p className="muted-label">Thời gian của bạn</p>
     <strong className="time-result">{formatTime(result.duration)}</strong>
-    <b className="winner-copy" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%" }}>Thật tuyệt vời <Crown color="red" fill="red" size={24} /></b>
+    <b className="winner-copy" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%" }}>Thật tuyệt vời <Crown color="#ffd72a" fill="#ffd72a" size={24} /></b>
     <p className="result-copy">{currentRank ? currentRank <= 3 ? <>Bạn đang ở <b>Top {currentRank}</b>.</> : <>Bạn đang ở <b>hạng {currentRank}</b>.</> : <>Kết quả của bạn đã được ghi nhận và BXH đang cập nhật.</>} Liên tục cập nhật BXH để theo dõi cơ hội nhận <b>01 chiếc xe máy điện Athena.</b></p>
     
     <div className="top-board">{podium.map((row, i) => <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
