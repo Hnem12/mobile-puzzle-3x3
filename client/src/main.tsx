@@ -1058,68 +1058,76 @@ function Images() {
           </button>
         </div>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Xem trước</th>
-            <th>Lưới</th>
-            <th>Trạng thái</th>
-            <th>Ngày tạo</th>
-            <th>Thao tác</th>
-          </tr>
-        </thead>
-        <tbody>
-          {images.map((img) => (
-            <tr key={img._id}>
-              <td>
-                <img className="thumb" src={img.imageUrl} />
-              </td>
-              <td>
-                <span className="pill">3x3</span>
-              </td>
-              <td>
-                <span className={img.status === "ACTIVE" ? "ok" : "bad"}>
-                  {img.status === "ACTIVE" ? "Hoạt động" : "Tạm dừng"}
-                </span>
-              </td>
-              <td>{img.createdAt?.slice(0, 10)}</td>
-              <td>
-                <div className="action-buttons">
-                  <button
-                    className={img.status === "ACTIVE" ? "warning" : "ok"}
-                    onClick={() =>
-                      fetch(`${API}/admin/images/${img._id}/status`, {
-                        method: "PATCH",
-                        headers: {
-                          ...auth(),
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                          status:
-                            img.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
-                        }),
-                      }).then(load)
-                    }
-                  >
-                    {img.status === "ACTIVE" ? "Tạm ngưng" : "Kích hoạt"}
-                  </button>
-                  <button
-                    className="danger"
-                    onClick={() =>
-                      fetch(`${API}/admin/images/${img._id}`, {
-                        method: "DELETE",
-                        headers: auth(),
-                      }).then(load)
-                    }
-                  >
-                    Xóa
-                  </button>
-                </div>
-              </td>
+      <div
+        style={{
+          maxHeight: "calc(100vh - 250px)",
+          overflowY: "auto",
+          overflowX: "auto",
+        }}
+      >
+        <table>
+          <thead>
+            <tr>
+              <th>Xem trước</th>
+              <th>Lưới</th>
+              <th>Trạng thái</th>
+              <th>Ngày tạo</th>
+              <th>Thao tác</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {images.map((img) => (
+              <tr key={img._id}>
+                <td>
+                  <img className="thumb" src={img.imageUrl} />
+                </td>
+                <td>
+                  <span className="pill">3x3</span>
+                </td>
+                <td>
+                  <span className={img.status === "ACTIVE" ? "ok" : "bad"}>
+                    {img.status === "ACTIVE" ? "Hoạt động" : "Tạm dừng"}
+                  </span>
+                </td>
+                <td>{img.createdAt?.slice(0, 10)}</td>
+                <td>
+                  <div className="action-buttons">
+                    <button
+                      className={img.status === "ACTIVE" ? "warning" : "ok"}
+                      onClick={() =>
+                        fetch(`${API}/admin/images/${img._id}/status`, {
+                          method: "PATCH",
+                          headers: {
+                            ...auth(),
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify({
+                            status:
+                              img.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+                          }),
+                        }).then(load)
+                      }
+                    >
+                      {img.status === "ACTIVE" ? "Tạm ngưng" : "Kích hoạt"}
+                    </button>
+                    <button
+                      className="danger"
+                      onClick={() =>
+                        fetch(`${API}/admin/images/${img._id}`, {
+                          method: "DELETE",
+                          headers: auth(),
+                        }).then(load)
+                      }
+                    >
+                      Xóa
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
