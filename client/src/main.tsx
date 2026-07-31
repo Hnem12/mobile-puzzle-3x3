@@ -251,33 +251,22 @@ function Result({ result, level, onReplay, onLeaderboard, onLogout }: { result: 
     <h1>{result.result === "WIN" ? "HOÀN THÀNH THỬ THÁCH" : "HẾT THỜI GIAN"}</h1>
     <p className="muted-label">Thời gian của bạn</p>
     <strong className="time-result">{formatTime(result.duration)}</strong>
-    <b className="winner-copy" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>Thật tuyệt vời <Crown color="red" fill="red" size={24} /></b>
+    <b className="winner-copy" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%" }}>Thật tuyệt vời <Crown color="red" fill="red" size={24} /></b>
     <p className="result-copy">{currentRank ? currentRank <= 3 ? <>Bạn đang ở <b>Top {currentRank}</b>.</> : <>Bạn đang ở <b>hạng {currentRank}</b>.</> : <>Kết quả của bạn đã được ghi nhận và BXH đang cập nhật.</>} Liên tục cập nhật BXH để theo dõi cơ hội nhận <b>01 chiếc xe máy điện Athena.</b></p>
     
-    <div className="top-board" style={{ alignItems: 'end' }}>{podium.map((row, i) => {
-      const colors = ["#fff", "#f7c948", "#ff784b"];
-      const sizes = [76, 96, 76];
-      return (
-        <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
-          <div style={{
-            width: sizes[i], height: sizes[i], borderRadius: '50%',
-            border: `3px solid ${colors[i]}`, display: 'flex', alignItems: 'center',
-            justifyContent: 'center', fontWeight: 900, fontSize: i === 1 ? 18 : 14,
-            color: '#fff', backgroundColor: '#111', marginBottom: 4
-          }}>
-            {podiumLabels[i]}
-          </div>
-          <b>{row?.fullName || "Chưa có dữ liệu"}</b>
-          <time>{formatTime(row?.bestDuration)}</time>
-        </article>
-      );
-    })}</div>
+    <div className="top-board">{podium.map((row, i) => <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
+      <div className="prize-orb"><img src={[imgTop2, imgTop1, imgTop3][i]} alt={podiumLabels[i]} /></div>
+      <strong className="rank-label">{podiumLabels[i]}</strong>
+      <b>{row?.fullName || "Chưa có dữ liệu"}</b>
+      <time>{formatTime(row?.bestDuration)}</time>
+    </article>)}</div>
     <div className="rank-list compact">
       {rest.length ? rest.map((row, i) => <p key={row.phone || i}><span>{String(i + 4).padStart(2, "0")}</span><strong>{row.fullName}</strong><b>{formatTime(row.bestDuration)}</b></p>) : <p><span>{currentIndex >= 0 ? String(currentIndex + 1).padStart(2, "0") : "--"}</span><strong>{result.user?.fullName || "Bạn"}</strong><b>{formatTime(result.duration)}</b></p>}
     </div>
     <button className="primary-red notify" onClick={onLeaderboard}><Bell size={16} /> THEO DÕI BẢNG XẾP HẠNG QUA ZALO NGAY</button>
   </section></main>;
 }
+
 function Leaderboard({ levels, onBack }: { levels: Level[]; onBack: () => void }) {
   const [rows, setRows] = useState<any[]>([]);
   
