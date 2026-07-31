@@ -359,11 +359,13 @@ function Admin() {
     <nav className="admin-nav">
       <button className={tab === "images" ? "active" : ""} onClick={() => setTab("images")}>Hình ảnh</button>
       <button className={tab === "history" ? "active" : ""} onClick={() => setTab("history")}>Lịch sử chơi</button>
+      <button className={tab === "users" ? "active" : ""} onClick={() => setTab("users")}>Thông tin người chơi</button>
       <button className={tab === "settings" ? "active" : ""} onClick={() => setTab("settings")}>Cấu hình Game</button>
       <button onClick={handleLogout} style={{ marginLeft: "auto", background: "transparent", color: "inherit", border: "1px solid rgba(255,255,255,0.2)" }}>Đăng xuất</button>
     </nav>
     {tab === "images" && <Images />}
     {tab === "history" && <History />}
+    {tab === "users" && <Users />}
     {tab === "settings" && <Settings />}
   </main>;
 }
@@ -487,6 +489,30 @@ function History() {
     URL.revokeObjectURL(url);
   }
   return <section><h1>Lịch sử chơi</h1><div className="filters"><input placeholder="Tìm tên..." value={q} onChange={e => setQ(e.target.value)} /><button type="button" onClick={exportExcel}><Download size={18} /> Xuất Excel</button></div><p>Tổng: <b>{rows.length}</b> bản ghi</p><table><thead><tr><th>Người dùng</th><th>Số điện thoại</th><th>Cấp</th><th>Kết quả</th><th>Điểm</th><th>Thời gian (s)</th><th>Bước</th><th>Ngày chơi</th></tr></thead><tbody>{rows.map(r => <tr key={r._id}><td>{r.userId?.fullName}</td><td>{r.userId?.phone}</td><td>{r.levelId?.name}</td><td><span className={r.result === "WIN" ? "ok" : "bad"}>{r.result}</span></td><td>{r.score}</td><td>{r.duration}</td><td>{r.moves}</td><td>{r.playedAt?.slice(0, 10)}</td></tr>)}</tbody></table></section>;
+}
+function Users() {
+  const [rows, setRows] = useState<any[]>([]); const [q, setQ] = useState("");
+  useEffect(() => { 
+    fetch(`${API}/admin/users?q=${encodeURIComponent(q)}`, { headers: auth() })
+      .then(r => {
+        if (r.status === 401) { localStorage.removeItem("adminToken"); window.location.reload(); return []; }
+        if (!r.ok) throw new Error("Cannot load users"); return r.json(); 
+      })
+      .then(data => setRows(Array.isArray(data) ? data : []))
+      .catch(() => setRows([])); 
+  }, [q]);
+  async function exportExcel() {
+    const res = await fetch(`${API}/admin/users/export?q=${q}`, { headers: auth() });
+    if (!res.ok) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "users.xlsx";
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+  return <section><h1>Thông tin người chơi</h1><div className="filters"><input placeholder="Tìm tên hoặc SĐT..." value={q} onChange={e => setQ(e.target.value)} /><button type="button" onClick={exportExcel}><Download size={18} /> Xuất Excel</button></div><p>Tổng: <b>{rows.length}</b> bản ghi</p><div style={{ overflowX: 'auto' }}><table><thead><tr><th>Họ và tên</th><th>Số điện thoại</th><th>Địa chỉ</th><th>Nhu cầu mua sắm</th><th>Sản phẩm quan tâm</th><th>Ngày đăng ký</th></tr></thead><tbody>{rows.map(r => <tr key={r._id}><td>{r.fullName}</td><td>{r.phone}</td><td>{r.address || ""}</td><td>{r.customerType === "agency" ? "Khách hàng đại lý" : "Khách hàng mua lẻ"}</td><td>{r.productOfInterest === "kingsport" ? "Kingsport" : "Xe điện MOVE"}</td><td>{r.createdAt?.slice(0, 10)}</td></tr>)}</tbody></table></div></section>;
 }
 function Settings() {
   const [levels, setLevels] = useState<Level[]>([]);

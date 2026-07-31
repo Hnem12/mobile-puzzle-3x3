@@ -141,6 +141,44 @@ app.put("/api/admin/settings", requireAdmin, async (req, res) => {
   res.json(settings);
 });
 
+app.get("/api/admin/users", requireAdmin, async (req, res) => {
+  const q = String(req.query.q || "").toLowerCase();
+  const filter = q ? {
+    $or: [
+      { fullName: { $regex: q, $options: "i" } },
+      { phone: { $regex: q, $options: "i" } },
+    ]
+  } : {};
+  res.json(await User.find(filter).sort({ createdAt: -1 }));
+});
+
+app.get("/api/admin/users/export", requireAdmin, async (req, res) => {
+  const q = String(req.query.q || "").toLowerCase();
+  const filter = q ? {
+    $or: [
+      { fullName: { $regex: q, $options: "i" } },
+      { phone: { $regex: q, $options: "i" } },
+    ]
+  } : {};
+  const users = await User.find(filter).sort({ createdAt: -1 }).lean();
+  const rows = users.map((u: any) => ({
+    "Họ và tên": u.fullName,
+    "Số điện thoại": u.phone,
+    "Địa chỉ": u.address || "",
+    "Loại KH": u.customerType === "agency" ? "Khách hàng đại lý" : "Khách hàng mua lẻ",
+    "Sản phẩm quan tâm": u.productOfInterest === "kingsport" ? "Kingsport" : "Xe điện MOVE",
+    "Ngày đăng ký": u.createdAt ? new Date(u.createdAt).toISOString().slice(0, 10) : "",
+  }));
+  const sheet = XLSX.utils.json_to_sheet(rows);
+  const book = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(book, sheet, "Users");
+  res.setHeader(
+    "Content-Disposition",
+    "attachment; filename=users.xlsx",
+  );
+  res.end(XLSX.write(book, { type: "buffer", bookType: "xlsx" }));
+});
+
 app.get("/api/admin/histories", requireAdmin, async (req, res) =>
   res.json(await queryHistories(req.query)),
 );
