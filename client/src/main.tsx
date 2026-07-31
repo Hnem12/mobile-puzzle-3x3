@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Bell, ChevronLeft, Download, Pause, Play, RotateCcw, Upload, X, Zap, User, Phone, MapPin, Store, Scan } from "lucide-react";
+import { Bell, ChevronLeft, Download, Pause, Play, RotateCcw, Upload, X, Zap, User, Phone, MapPin, Store, Scan, Crown } from "lucide-react";
 import racingBg from "./assets/form-bg.png";
 import logoMove from "./assets/logo-move.png";
 import logoKingsport from "./assets/logo-kingsport.png";
@@ -251,15 +251,27 @@ function Result({ result, level, onReplay, onLeaderboard, onLogout }: { result: 
     <h1>{result.result === "WIN" ? "HOÀN THÀNH THỬ THÁCH" : "HẾT THỜI GIAN"}</h1>
     <p className="muted-label">Thời gian của bạn</p>
     <strong className="time-result">{formatTime(result.duration)}</strong>
-    <b className="winner-copy">Thật tuyệt vời</b>
+    <b className="winner-copy" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>Thật tuyệt vời <Crown color="red" fill="red" size={24} /></b>
     <p className="result-copy">{currentRank ? currentRank <= 3 ? <>Bạn đang ở <b>Top {currentRank}</b>.</> : <>Bạn đang ở <b>hạng {currentRank}</b>.</> : <>Kết quả của bạn đã được ghi nhận và BXH đang cập nhật.</>} Liên tục cập nhật BXH để theo dõi cơ hội nhận <b>01 chiếc xe máy điện Athena.</b></p>
     
-    <div className="top-board">{podium.map((row, i) => <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
-      <div className="prize-orb"><img src={[imgTop2, imgTop1, imgTop3][i]} alt={podiumLabels[i]} /></div>
-      <strong className="rank-label">{podiumLabels[i]}</strong>
-      <b>{row?.fullName || "Chưa có dữ liệu"}</b>
-      <time>{formatTime(row?.bestDuration)}</time>
-    </article>)}</div>
+    <div className="top-board" style={{ alignItems: 'end' }}>{podium.map((row, i) => {
+      const colors = ["#fff", "#f7c948", "#ff784b"];
+      const sizes = [76, 96, 76];
+      return (
+        <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
+          <div style={{
+            width: sizes[i], height: sizes[i], borderRadius: '50%',
+            border: `3px solid ${colors[i]}`, display: 'flex', alignItems: 'center',
+            justifyContent: 'center', fontWeight: 900, fontSize: i === 1 ? 18 : 14,
+            color: '#fff', backgroundColor: '#111', marginBottom: 4
+          }}>
+            {podiumLabels[i]}
+          </div>
+          <b>{row?.fullName || "Chưa có dữ liệu"}</b>
+          <time>{formatTime(row?.bestDuration)}</time>
+        </article>
+      );
+    })}</div>
     <div className="rank-list compact">
       {rest.length ? rest.map((row, i) => <p key={row.phone || i}><span>{String(i + 4).padStart(2, "0")}</span><strong>{row.fullName}</strong><b>{formatTime(row.bestDuration)}</b></p>) : <p><span>{currentIndex >= 0 ? String(currentIndex + 1).padStart(2, "0") : "--"}</span><strong>{result.user?.fullName || "Bạn"}</strong><b>{formatTime(result.duration)}</b></p>}
     </div>
@@ -299,7 +311,7 @@ function Leaderboard({ levels, onBack }: { levels: Level[]; onBack: () => void }
     <BrandHeader />
     <div className="leaderboard-header-title">
       <h1><span className="bolt"><Zap size={22} fill="currentColor" /></span> Move to be king</h1>
-      <p className="subtitle">The faster hand</p>
+      <p className="subtitle" style={{ color: "red" }}>The faster hand</p>
     </div>
     <div className="top-board">{podium.map((row, i) => <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
       <div className="prize-orb"><img src={[imgTop2, imgTop1, imgTop3][i]} alt={podiumLabels[i]} /></div>
