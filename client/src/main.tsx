@@ -1058,13 +1058,7 @@ function Images() {
           </button>
         </div>
       </div>
-      <div
-        style={{
-          maxHeight: "calc(100vh - 280px)",
-          overflowY: "auto",
-          overflowX: "auto",
-        }}
-      >
+      <div className="table-container">
         <table>
           <thead>
             <tr>
@@ -1200,13 +1194,7 @@ function History() {
       <p>
         Tổng: <b>{rows.length}</b> bản ghi
       </p>
-      <div
-        style={{
-          maxHeight: "calc(100vh - 280px)",
-          overflowY: "auto",
-          overflowX: "auto",
-        }}
-      >
+      <div className="table-container">
         <table>
           <thead>
             <tr>
@@ -1287,13 +1275,7 @@ function Users() {
       <p>
         Tổng: <b>{rows.length}</b> bản ghi
       </p>
-      <div
-        style={{
-          maxHeight: "calc(100vh - 280px)",
-          overflowY: "auto",
-          overflowX: "auto",
-        }}
-      >
+      <div className="table-container">
         <table>
           <thead>
             <tr>

@@ -319,11 +319,26 @@ input, select {
 .rank-list span { color: #ff263a; font-weight: 900; }
 .rank-list b { color: #ff5362; font-size: 12px; }
 .admin {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
   padding: 24px 16px;
   max-width: 1000px;
   margin: 0 auto;
+  height: 100vh;
+  overflow: hidden;
+}
+.admin section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+.table-container {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
 }
 .admin-nav { 
   display: flex; 
