@@ -9,7 +9,8 @@ body:has(.game-hero), body:has(.play-screen), body:has(.result-hero) {
   background-color: #050609;
 }
 body:has(.login-container) {
-  background-image: url('./assets/racing-city-bg.jpg');
+  background-color: #0f172a;
+  background-image: url('./assets/racing-city-bg.webp');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
