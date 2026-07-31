@@ -1060,7 +1060,7 @@ function Images() {
       </div>
       <div
         style={{
-          maxHeight: "calc(100vh - 250px)",
+          maxHeight: "calc(100vh - 280px)",
           overflowY: "auto",
           overflowX: "auto",
         }}
@@ -1202,7 +1202,7 @@ function History() {
       </p>
       <div
         style={{
-          maxHeight: "calc(100vh - 250px)",
+          maxHeight: "calc(100vh - 280px)",
           overflowY: "auto",
           overflowX: "auto",
         }}
@@ -1289,7 +1289,7 @@ function Users() {
       </p>
       <div
         style={{
-          maxHeight: "calc(100vh - 250px)",
+          maxHeight: "calc(100vh - 280px)",
           overflowY: "auto",
           overflowX: "auto",
         }}
