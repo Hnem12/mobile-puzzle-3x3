@@ -63,12 +63,6 @@ app.get("/", (req, res) => {
 });
 
 app.use(express.json());
-app.use("/uploads", express.static(uploadDir));
-
-const publicUrl = (req: express.Request, file: string) => {
-  const protocol = req.headers["x-forwarded-proto"] || req.protocol;
-  return `${protocol}://${req.get("host")}/uploads/${file}`;
-};
 
 app.post("/api/auth/login", (req, res) => {
   const { username, password } = req.body;

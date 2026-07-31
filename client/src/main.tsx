@@ -81,10 +81,20 @@ function Game() {
 
   const activeLevel = boot.levels[0];
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    setResult(null);
+    if (boot) {
+      const imgs = boot.images && boot.images.length > 0 ? boot.images : (boot.image ? [boot.image] : []);
+      setImage(imgs.length > 0 ? imgs[Math.floor(Math.random() * imgs.length)] : null);
+    }
+  };
+
   if (leaderboard) return <Leaderboard levels={[activeLevel]} onBack={() => setLeaderboard(false)} />;
-  if (result) return <Result result={result} level={activeLevel} onReplay={() => setResult(null)} onLeaderboard={() => setLeaderboard(true)} onLogout={() => { localStorage.removeItem("user"); setUser(null); setResult(null); }} />;
+  if (result) return <Result result={result} level={activeLevel} onReplay={() => setResult(null)} onLeaderboard={() => setLeaderboard(true)} onLogout={handleLogout} />;
   if (!user) return <Register onDone={u => { localStorage.setItem("user", JSON.stringify(u)); setUser(u); }} disabled={!boot.settings.gameStatus} />;
-  return <Puzzle user={user} level={activeLevel} image={image} onDone={setResult} onLogout={() => { localStorage.removeItem("user"); setUser(null); }} />;
+  return <Puzzle user={user} level={activeLevel} image={image} onDone={setResult} onLogout={handleLogout} />;
 }
 
 function Register({ onDone, disabled }: { onDone: (u: any) => void; disabled: boolean }) {
