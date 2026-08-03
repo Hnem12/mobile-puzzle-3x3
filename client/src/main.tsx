@@ -910,6 +910,12 @@ function Admin() {
         >
           Cấu hình Game
         </button>
+          <button
+          className={tab === "api_settings" ? "active" : ""}
+          onClick={() => setTab("api_settings")}
+        >
+          Cấu hình API
+        </button>
         <button
           onClick={handleLogout}
           style={{
@@ -926,6 +932,7 @@ function Admin() {
       {tab === "history" && <History />}
       {tab === "users" && <Users />}
       {tab === "settings" && <Settings />}
+      {tab === "api_settings" && <ApiSettings />}
     </main>
   );
 }
@@ -1445,6 +1452,122 @@ function calcScore(level: Level, duration: number, moves: number) {
   return Math.max(
     100,
     (rule?.score || Math.round(level.maxScore * 0.5)) - moves * 10,
+  );
+}
+
+function ApiSettings() {
+  const [config, setConfig] = useState<any>({});
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetch(`${API}/admin/settings`, { headers: auth() })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && !Array.isArray(data)) {
+          setConfig(data);
+        }
+      });
+  }, []);
+
+  async function save() {
+    setLoading(true);
+    try {
+      await fetch(`${API}/admin/settings`, {
+        method: "PUT",
+        headers: { ...auth(), "Content-Type": "application/json" },
+        body: JSON.stringify(config),
+      });
+      alert("Lưu cấu hình API thành công!");
+    } catch (e) {
+      alert("Lỗi khi lưu cấu hình API.");
+    }
+    setLoading(false);
+  }
+
+  return (
+    <section>
+      <h1>Cấu hình API</h1>
+      <div className="admin-card stack" style={{ maxWidth: 600 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <strong style={{ fontSize: 16, display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#0068ff" }}></span> Bot API Zalo ZBS
+          </strong>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, margin: 0 }}>
+            <input
+              type="checkbox"
+              checked={true}
+              disabled
+              style={{ width: "auto" }}
+            />
+          </label>
+        </div>
+        
+        <label>
+          Tên Trigger <span style={{color: "red"}}>*</span>
+          <input
+            value={config.triggerName || ""}
+            onChange={(e) => setConfig({ ...config, triggerName: e.target.value })}
+            placeholder="Bot API Zalo ZBS"
+            style={{ background: "#f8f9fa", border: "1px solid #e9ecef" }}
+          />
+        </label>
+
+        <label style={{ margin: "16px 0", fontSize: 14 }}>
+          <b>Cài đặt trigger</b>
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, flexDirection: "row", marginTop: -10 }}>
+          <input
+            type="checkbox"
+            checked={config.triggerInterval || false}
+            onChange={(e) => setConfig({ ...config, triggerInterval: e.target.checked })}
+            style={{ width: "auto", margin: 0 }}
+          />
+          <span style={{ fontSize: 14, color: "#495057" }}>Run trigger theo khoảng thời gian</span>
+        </label>
+
+        <hr style={{ margin: "24px 0", border: "none", borderTop: "1px solid #e9ecef" }} />
+
+        <label style={{ fontSize: 14, fontWeight: "bold", marginBottom: 8 }}>Post API</label>
+        <textarea
+          value={config.apiPostUrl || ""}
+          onChange={(e) => setConfig({ ...config, apiPostUrl: e.target.value })}
+          placeholder="https://api.smax.ai/..."
+          rows={2}
+          style={{ fontFamily: "monospace", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #e9ecef", background: "#f8f9fa", resize: "vertical", marginBottom: 16 }}
+        />
+
+        <label style={{ fontSize: 14, fontWeight: "bold", marginBottom: 8 }}>Headers</label>
+        <textarea
+          value={config.apiHeaders || ""}
+          onChange={(e) => setConfig({ ...config, apiHeaders: e.target.value })}
+          placeholder='{\n  "Authorization": "Bearer ..."\n}'
+          rows={4}
+          style={{ fontFamily: "monospace", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #e9ecef", background: "#f8f9fa", resize: "vertical", marginBottom: 16 }}
+        />
+
+        <label style={{ fontSize: 14, fontWeight: "bold", marginBottom: 8 }}>Body</label>
+        <textarea
+          value={config.apiBody || ""}
+          onChange={(e) => setConfig({ ...config, apiBody: e.target.value })}
+          placeholder='{\n  "sdt": "<sdt here>",\n  "page_id": "98732384813610746"\n}'
+          rows={8}
+          style={{ fontFamily: "monospace", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #e9ecef", background: "#f8f9fa", resize: "vertical", marginBottom: 16 }}
+        />
+        
+        <label style={{ fontSize: 14, fontWeight: "bold", marginBottom: 8, background: "#e9ecef", display: "inline-block", padding: "4px 8px", borderRadius: 4 }}>Hoặc Get API</label>
+        <textarea
+          value={config.apiGetUrl || ""}
+          onChange={(e) => setConfig({ ...config, apiGetUrl: e.target.value })}
+          placeholder="https://api.smax.ai/...&access_token=..."
+          rows={6}
+          style={{ fontFamily: "monospace", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #e9ecef", background: "#f8f9fa", resize: "vertical" }}
+        />
+
+        <button onClick={save} disabled={loading} className="primary-red" style={{ marginTop: 24, alignSelf: "flex-start", padding: "10px 24px" }}>
+          {loading ? "Đang lưu..." : "Lưu cấu hình API"}
+        </button>
+      </div>
+    </section>
   );
 }
 

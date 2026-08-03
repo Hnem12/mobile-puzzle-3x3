@@ -40,7 +40,13 @@ const gameSettingsSchema = new Schema(
     playMode: { type: String, enum: ["ONCE_PER_PHONE", "MULTIPLE"], default: "ONCE_PER_PHONE" },
     allowMultiplePlay: { type: Boolean, default: false },
     gameStatus: { type: Boolean, default: true },
-    leaderboardEnabled: { type: Boolean, default: true }
+    leaderboardEnabled: { type: Boolean, default: true },
+    triggerName: { type: String, default: "Bot API Zalo ZBS" },
+    triggerInterval: { type: Boolean, default: false },
+    apiPostUrl: { type: String, default: "" },
+    apiHeaders: { type: String, default: "" },
+    apiBody: { type: String, default: "" },
+    apiGetUrl: { type: String, default: "" }
   },
   { timestamps: { createdAt: false, updatedAt: true }, collection: "game_settings" }
 );
