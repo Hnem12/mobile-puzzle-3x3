@@ -292,6 +292,18 @@ app.post("/api/game/histories", async (req, res) => {
         const user = await User.findById(parsed.data.userId);
         if (user && user.phone) {
           
+          let userRank = "--";
+          if (parsed.data.result === "WIN") {
+            const fullBoard = await GameHistory.aggregate([
+              { $match: { result: "WIN", levelId: new mongoose.Types.ObjectId(parsed.data.levelId) } },
+              { $sort: { duration: 1, score: -1, moves: 1 } },
+              { $group: { _id: "$userId", bestDuration: { $first: "$duration" }, score: { $first: "$score" }, moves: { $first: "$moves" } } },
+              { $sort: { bestDuration: 1, score: -1, moves: 1 } }
+            ]);
+            const idx = fullBoard.findIndex((b: any) => String(b._id) === String(user._id));
+            if (idx >= 0) userRank = String(idx + 1);
+          }
+
           const replacePlaceholders = (str: string) => {
             return str
               .replace(/{{(phone|sdt)}}/g, user.phone)
@@ -299,7 +311,8 @@ app.post("/api/game/histories", async (req, res) => {
               .replace(/{{result}}/g, parsed.data.result)
               .replace(/{{score}}/g, String(parsed.data.score))
               .replace(/{{duration}}/g, String(parsed.data.duration))
-              .replace(/{{moves}}/g, String(parsed.data.moves));
+              .replace(/{{moves}}/g, String(parsed.data.moves))
+              .replace(/{{top}}/g, userRank);
           };
 
           if (settings.apiPostUrl) {
