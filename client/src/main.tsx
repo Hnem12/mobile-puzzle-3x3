@@ -1496,27 +1496,73 @@ function ApiSettings() {
       
       <div className="admin-card stack" style={{ maxWidth: 760, padding: "32px 36px", gap: 28, borderRadius: 12 }}>
         
-        <div style={{ position: "relative", display: "inline-block", alignSelf: "flex-start" }}>
-          <span 
-            onMouseEnter={() => setShowHint(true)} 
-            onMouseLeave={() => setShowHint(false)}
-            style={{ cursor: "help", color: "#3b82f6", fontSize: 14, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}
+        <div style={{ alignSelf: "flex-start" }}>
+          <button 
+            type="button"
+            onClick={() => setShowHint(true)}
+            style={{ background: "transparent", color: "#3b82f6", fontSize: 14, fontWeight: 600, padding: 0, minHeight: "auto", textDecoration: "underline", display: "inline-flex", alignItems: "center", gap: 6 }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-            Xem danh sách biến tự động (cho URL và Body)
-          </span>
+            Xem danh sách biến tự động
+          </button>
           
           {showHint && (
-            <div style={{ position: "absolute", zIndex: 10, top: "100%", left: 0, marginTop: 8, background: "#1e293b", padding: "16px 20px", borderRadius: "8px", fontSize: "13px", color: "#f8fafc", width: "max-content", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)", border: "1px solid #334155" }}>
-              <strong style={{ display: "block", marginBottom: "12px", color: "#93c5fd", fontSize: 14 }}>Các biến có thể chèn vào cấu hình API:</strong>
-              <ul style={{ margin: 0, paddingLeft: "16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 24px" }}>
-                <li><code style={{ color: "#f87171", background: "rgba(0,0,0,0.2)", padding: "2px 6px", borderRadius: 4, marginRight: 4 }}>&lt;sdt here&gt;</code> Số điện thoại</li>
-                <li><code style={{ color: "#f87171", background: "rgba(0,0,0,0.2)", padding: "2px 6px", borderRadius: 4, marginRight: 4 }}>&lt;name here&gt;</code> Họ và tên</li>
-                <li><code style={{ color: "#f87171", background: "rgba(0,0,0,0.2)", padding: "2px 6px", borderRadius: 4, marginRight: 4 }}>&lt;result here&gt;</code> Kết quả</li>
-                <li><code style={{ color: "#f87171", background: "rgba(0,0,0,0.2)", padding: "2px 6px", borderRadius: 4, marginRight: 4 }}>&lt;score here&gt;</code> Điểm số</li>
-                <li><code style={{ color: "#f87171", background: "rgba(0,0,0,0.2)", padding: "2px 6px", borderRadius: 4, marginRight: 4 }}>&lt;duration here&gt;</code> Thời gian chơi</li>
-                <li><code style={{ color: "#f87171", background: "rgba(0,0,0,0.2)", padding: "2px 6px", borderRadius: 4, marginRight: 4 }}>&lt;moves here&gt;</code> Số bước đi</li>
-              </ul>
+            <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.4)", backdropFilter: "blur(2px)" }}>
+              <div style={{ background: "white", borderRadius: 12, width: "100%", maxWidth: 600, boxShadow: "0 20px 40px -10px rgba(0,0,0,0.15)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                
+                <div style={{ padding: "16px 24px", borderBottom: "1px solid #f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <h3 style={{ margin: 0, fontSize: 18, color: "#1e293b" }}>Danh sách biến</h3>
+                  <button onClick={() => setShowHint(false)} style={{ background: "transparent", border: "none", color: "#64748b", padding: 8, cursor: "pointer", minHeight: "auto" }}>
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div style={{ padding: 24 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", background: "white", boxShadow: "none" }}>
+                    <thead>
+                      <tr>
+                        <th style={{ background: "transparent", color: "#94a3b8", fontSize: 12, textTransform: "uppercase", padding: "8px 12px", borderBottom: "1px solid #e2e8f0" }}>TÊN BIẾN</th>
+                        <th style={{ background: "transparent", color: "#94a3b8", fontSize: 12, textTransform: "uppercase", padding: "8px 12px", borderBottom: "1px solid #e2e8f0" }}>NHÓM</th>
+                        <th style={{ background: "transparent", color: "#94a3b8", fontSize: 12, textTransform: "uppercase", padding: "8px 12px", borderBottom: "1px solid #e2e8f0" }}>LOẠI DỮ LIỆU</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { code: "{{phone}}", group: "Thông tin người chơi", type: "TEXT" },
+                        { code: "{{name}}", group: "Thông tin người chơi", type: "TEXT" },
+                        { code: "{{result}}", group: "Kết quả chơi", type: "TEXT" },
+                        { code: "{{score}}", group: "Kết quả chơi", type: "NUMBER" },
+                        { code: "{{duration}}", group: "Kết quả chơi", type: "NUMBER" },
+                        { code: "{{moves}}", group: "Kết quả chơi", type: "NUMBER" }
+                      ].map(v => (
+                        <tr key={v.code}>
+                          <td style={{ padding: "12px", borderBottom: "1px solid #f1f5f9" }}>
+                            <button 
+                              onClick={() => {
+                                navigator.clipboard.writeText(v.code);
+                                alert("Đã copy: " + v.code);
+                              }}
+                              style={{ 
+                                background: "#f3e8ff", color: "#9333ea", padding: "4px 10px", 
+                                borderRadius: 999, fontSize: 13, fontFamily: "monospace", 
+                                border: "none", cursor: "pointer", minHeight: "auto",
+                                transition: "background 0.2s"
+                              }}
+                              title="Click để copy"
+                            >
+                              {v.code}
+                            </button>
+                          </td>
+                          <td style={{ padding: "12px", borderBottom: "1px solid #f1f5f9", fontSize: 14, color: "#475569" }}>{v.group}</td>
+                          <td style={{ padding: "12px", borderBottom: "1px solid #f1f5f9", fontSize: 14, color: "#475569" }}>{v.type}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <p style={{ margin: "16px 0 0", fontSize: 13, color: "#64748b", textAlign: "center" }}>* Nhấn vào tên biến để copy nhanh.</p>
+                </div>
+
+              </div>
             </div>
           )}
         </div>

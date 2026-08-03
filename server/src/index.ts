@@ -294,12 +294,12 @@ app.post("/api/game/histories", async (req, res) => {
           
           const replacePlaceholders = (str: string) => {
             return str
-              .replace(/<sdt here>/g, user.phone)
-              .replace(/<name here>/g, user.fullName || "")
-              .replace(/<result here>/g, parsed.data.result)
-              .replace(/<score here>/g, String(parsed.data.score))
-              .replace(/<duration here>/g, String(parsed.data.duration))
-              .replace(/<moves here>/g, String(parsed.data.moves));
+              .replace(/{{(phone|sdt)}}/g, user.phone)
+              .replace(/{{name}}/g, user.fullName || "")
+              .replace(/{{result}}/g, parsed.data.result)
+              .replace(/{{score}}/g, String(parsed.data.score))
+              .replace(/{{duration}}/g, String(parsed.data.duration))
+              .replace(/{{moves}}/g, String(parsed.data.moves));
           };
 
           if (settings.apiPostUrl) {
