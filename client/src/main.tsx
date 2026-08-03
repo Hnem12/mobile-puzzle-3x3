@@ -1458,6 +1458,7 @@ function calcScore(level: Level, duration: number, moves: number) {
 function ApiSettings() {
   const [config, setConfig] = useState<any>({});
   const [loading, setLoading] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
     fetch(`${API}/admin/settings`, { headers: auth() })
@@ -1526,6 +1527,30 @@ function ApiSettings() {
         </label>
 
         <hr style={{ margin: "24px 0", border: "none", borderTop: "1px solid #e9ecef" }} />
+        
+        <div style={{ position: "relative", display: "inline-block", marginBottom: 16 }}>
+          <span 
+            onMouseEnter={() => setShowHint(true)} 
+            onMouseLeave={() => setShowHint(false)}
+            style={{ cursor: "help", color: "#0068ff", fontSize: 13, fontWeight: 500, textDecoration: "underline", display: "flex", alignItems: "center", gap: 4, width: "fit-content" }}
+          >
+            ⓘ Xem danh sách biến tự động (cho URL và Body)
+          </span>
+          
+          {showHint && (
+            <div style={{ position: "absolute", zIndex: 10, top: "100%", left: 0, marginTop: 8, background: "#fff", padding: "12px", borderRadius: "8px", fontSize: "13px", color: "#333", width: "max-content", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", border: "1px solid #e9ecef" }}>
+              <strong style={{ display: "block", marginBottom: "6px" }}>Các biến có thể chèn vào cấu hình API:</strong>
+              <ul style={{ margin: 0, paddingLeft: "20px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                <li><code>&lt;sdt here&gt;</code>: Số điện thoại</li>
+                <li><code>&lt;name here&gt;</code>: Họ và tên</li>
+                <li><code>&lt;result here&gt;</code>: Kết quả (WIN/LOSE)</li>
+                <li><code>&lt;score here&gt;</code>: Điểm số</li>
+                <li><code>&lt;duration here&gt;</code>: Thời gian chơi (giây)</li>
+                <li><code>&lt;moves here&gt;</code>: Số bước đi</li>
+              </ul>
+            </div>
+          )}
+        </div>
 
         <label style={{ fontSize: 14, fontWeight: "bold", marginBottom: 8 }}>Post API</label>
         <textarea

@@ -282,7 +282,57 @@ app.post("/api/game/histories", async (req, res) => {
       .json({ message: "Tài khoản này đã ghi nhận kết quả trò chơi" });
   }
 
-  res.status(201).json(await GameHistory.create(parsed.data));
+  const history = await GameHistory.create(parsed.data);
+  res.status(201).json(history);
+
+  // Trigger configured ZBS API
+  (async () => {
+    try {
+      if (settings.apiPostUrl || settings.apiGetUrl) {
+        const user = await User.findById(parsed.data.userId);
+        if (user && user.phone) {
+          
+          const replacePlaceholders = (str: string) => {
+            return str
+              .replace(/<sdt here>/g, user.phone)
+              .replace(/<name here>/g, user.fullName || "")
+              .replace(/<result here>/g, parsed.data.result)
+              .replace(/<score here>/g, String(parsed.data.score))
+              .replace(/<duration here>/g, String(parsed.data.duration))
+              .replace(/<moves here>/g, String(parsed.data.moves));
+          };
+
+          if (settings.apiPostUrl) {
+            let bodyStr = settings.apiBody || "";
+            bodyStr = replacePlaceholders(bodyStr);
+            let postUrl = replacePlaceholders(settings.apiPostUrl);
+            
+            let headersObj: Record<string, string> = {
+              "Content-Type": "application/json"
+            };
+            if (settings.apiHeaders) {
+              try {
+                headersObj = { ...headersObj, ...JSON.parse(settings.apiHeaders) };
+              } catch (e) {
+                console.error("Error parsing API Headers:", e);
+              }
+            }
+
+            await fetch(postUrl, {
+              method: "POST",
+              headers: headersObj,
+              body: bodyStr
+            });
+          } else if (settings.apiGetUrl) {
+            let urlStr = replacePlaceholders(settings.apiGetUrl);
+            await fetch(urlStr, { method: "GET" });
+          }
+        }
+      }
+    } catch (e) {
+      console.error("ZBS API Trigger Error:", e);
+    }
+  })();
 });
 app.get("/api/game/leaderboard", async (req, res) =>
   res.json(await leaderboard(req.query.levelId as string)),
