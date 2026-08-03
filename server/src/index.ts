@@ -294,13 +294,11 @@ app.post("/api/game/histories", async (req, res) => {
           
           let userRank = "--";
           if (parsed.data.result === "WIN") {
-            const fullBoard = await GameHistory.aggregate([
-              { $match: { result: "WIN", levelId: new mongoose.Types.ObjectId(parsed.data.levelId) } },
-              { $sort: { duration: 1, score: -1, moves: 1 } },
-              { $group: { _id: "$userId", bestDuration: { $first: "$duration" }, score: { $first: "$score" }, moves: { $first: "$moves" } } },
-              { $sort: { bestDuration: 1, score: -1, moves: 1 } }
-            ]);
-            const idx = fullBoard.findIndex((b: any) => String(b._id) === String(user._id));
+            const allWins = await GameHistory.find({ result: "WIN" })
+              .sort({ duration: 1, score: -1, moves: 1 })
+              .select("_id")
+              .lean();
+            const idx = allWins.findIndex((w: any) => String(w._id) === String(history._id));
             if (idx >= 0) userRank = String(idx + 1);
           }
 
@@ -376,12 +374,26 @@ async function queryHistories(query: Record<string, unknown>) {
     if (query.to) playedAt.$lte = new Date(String(query.to));
     match.playedAt = playedAt;
   }
+  
+  const allWins = await GameHistory.find({ result: "WIN" })
+    .sort({ duration: 1, score: -1, moves: 1 })
+    .select("_id")
+    .lean();
+  const winRanks = new Map<string, number>();
+  allWins.forEach((w, i) => winRanks.set(String(w._id), i + 1));
+
   const rows = await GameHistory.find(match)
     .populate("userId")
     .populate("levelId")
     .sort({ playedAt: -1 })
     .lean();
-  return rows.filter((row: any) => {
+    
+  return rows.map((row: any) => {
+    if (row.result === "WIN") {
+      row.rank = winRanks.get(String(row._id));
+    }
+    return row;
+  }).filter((row: any) => {
     const user = row.userId || {};
     return (
       (!query.name ||

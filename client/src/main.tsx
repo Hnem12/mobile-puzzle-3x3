@@ -1219,9 +1219,9 @@ function History() {
             {rows.map((r, i) => (
               <tr key={r._id}>
                 <td>
-                  {r.result === "WIN" ? (
-                    <span style={{ fontWeight: i < 10 ? "bold" : "normal", color: i < 3 ? "#ef4444" : "inherit" }}>
-                      Top {i + 1}
+                  {r.result === "WIN" && r.rank ? (
+                    <span style={{ fontWeight: r.rank <= 10 ? "bold" : "normal", color: r.rank <= 3 ? "#ef4444" : "inherit" }}>
+                      Top {r.rank}
                     </span>
                   ) : (
                     "--"
