@@ -318,14 +318,17 @@ app.post("/api/game/histories", async (req, res) => {
               }
             }
 
-            await fetch(postUrl, {
+            const zbsRes = await fetch(postUrl, {
               method: "POST",
               headers: headersObj,
               body: bodyStr
             });
+            const textRes = await zbsRes.text();
+            console.log("ZBS Trigger POST status:", zbsRes.status, textRes);
           } else if (settings.apiGetUrl) {
             let urlStr = replacePlaceholders(settings.apiGetUrl);
-            await fetch(urlStr, { method: "GET" });
+            const zbsRes = await fetch(urlStr, { method: "GET" });
+            console.log("ZBS Trigger GET status:", zbsRes.status, await zbsRes.text());
           }
         }
       }
