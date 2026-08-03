@@ -327,7 +327,15 @@ app.post("/api/game/histories", async (req, res) => {
             console.log("ZBS Trigger POST status:", zbsRes.status, textRes);
           } else if (settings.apiGetUrl) {
             let urlStr = replacePlaceholders(settings.apiGetUrl);
-            const zbsRes = await fetch(urlStr, { method: "GET" });
+            
+            // Encode the URL to handle spaces and raw JSON characters in the query
+            // Ignore encoding if it somehow fails, but encodeURI is usually safe.
+            let finalUrl = urlStr;
+            try {
+              finalUrl = encodeURI(urlStr);
+            } catch(e) {}
+            
+            const zbsRes = await fetch(finalUrl, { method: "GET" });
             console.log("ZBS Trigger GET status:", zbsRes.status, await zbsRes.text());
           }
         }
