@@ -1489,45 +1489,7 @@ function ApiSettings() {
     <section>
       <h1>Cấu hình API</h1>
       <div className="admin-card stack" style={{ maxWidth: 600 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <strong style={{ fontSize: 16, display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#0068ff" }}></span> Bot API Zalo ZBS
-          </strong>
-          <label style={{ display: "flex", alignItems: "center", gap: 8, margin: 0 }}>
-            <input
-              type="checkbox"
-              checked={true}
-              disabled
-              style={{ width: "auto" }}
-            />
-          </label>
-        </div>
-        
-        <label>
-          Tên Trigger <span style={{color: "red"}}>*</span>
-          <input
-            value={config.triggerName || ""}
-            onChange={(e) => setConfig({ ...config, triggerName: e.target.value })}
-            placeholder="Bot API Zalo ZBS"
-            style={{ background: "#f8f9fa", border: "1px solid #e9ecef" }}
-          />
-        </label>
-
-        <label style={{ margin: "16px 0", fontSize: 14 }}>
-          <b>Cài đặt trigger</b>
-        </label>
-        <label style={{ display: "flex", alignItems: "center", gap: 8, flexDirection: "row", marginTop: -10 }}>
-          <input
-            type="checkbox"
-            checked={config.triggerInterval || false}
-            onChange={(e) => setConfig({ ...config, triggerInterval: e.target.checked })}
-            style={{ width: "auto", margin: 0 }}
-          />
-          <span style={{ fontSize: 14, color: "#495057" }}>Run trigger theo khoảng thời gian</span>
-        </label>
-
         <hr style={{ margin: "24px 0", border: "none", borderTop: "1px solid #e9ecef" }} />
-        
         <div style={{ position: "relative", display: "inline-block", marginBottom: 16 }}>
           <span 
             onMouseEnter={() => setShowHint(true)} 
