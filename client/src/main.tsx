@@ -1487,72 +1487,84 @@ function ApiSettings() {
 
   return (
     <section>
-      <h1>Cấu hình API</h1>
-      <div className="admin-card stack" style={{ maxWidth: 600 }}>
-        <hr style={{ margin: "24px 0", border: "none", borderTop: "1px solid #e9ecef" }} />
-        <div style={{ position: "relative", display: "inline-block", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#0f172a" }}>Cấu hình API</h1>
+        <button onClick={save} disabled={loading} style={{ minHeight: 40, padding: "0 20px", background: "#0f172a", borderRadius: 8, fontSize: 14 }}>
+          {loading ? "Đang lưu..." : "Lưu cấu hình"}
+        </button>
+      </div>
+      
+      <div className="admin-card stack" style={{ maxWidth: 760, padding: "32px 36px", gap: 28, borderRadius: 12 }}>
+        
+        <div style={{ position: "relative", display: "inline-block", alignSelf: "flex-start" }}>
           <span 
             onMouseEnter={() => setShowHint(true)} 
             onMouseLeave={() => setShowHint(false)}
-            style={{ cursor: "help", color: "#0068ff", fontSize: 13, fontWeight: 500, textDecoration: "underline", display: "flex", alignItems: "center", gap: 4, width: "fit-content" }}
+            style={{ cursor: "help", color: "#3b82f6", fontSize: 14, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}
           >
-            ⓘ Xem danh sách biến tự động (cho URL và Body)
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            Xem danh sách biến tự động (cho URL và Body)
           </span>
           
           {showHint && (
-            <div style={{ position: "absolute", zIndex: 10, top: "100%", left: 0, marginTop: 8, background: "#fff", padding: "12px", borderRadius: "8px", fontSize: "13px", color: "#333", width: "max-content", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", border: "1px solid #e9ecef" }}>
-              <strong style={{ display: "block", marginBottom: "6px" }}>Các biến có thể chèn vào cấu hình API:</strong>
-              <ul style={{ margin: 0, paddingLeft: "20px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                <li><code>&lt;sdt here&gt;</code>: Số điện thoại</li>
-                <li><code>&lt;name here&gt;</code>: Họ và tên</li>
-                <li><code>&lt;result here&gt;</code>: Kết quả (WIN/LOSE)</li>
-                <li><code>&lt;score here&gt;</code>: Điểm số</li>
-                <li><code>&lt;duration here&gt;</code>: Thời gian chơi (giây)</li>
-                <li><code>&lt;moves here&gt;</code>: Số bước đi</li>
+            <div style={{ position: "absolute", zIndex: 10, top: "100%", left: 0, marginTop: 8, background: "#1e293b", padding: "16px 20px", borderRadius: "8px", fontSize: "13px", color: "#f8fafc", width: "max-content", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)", border: "1px solid #334155" }}>
+              <strong style={{ display: "block", marginBottom: "12px", color: "#93c5fd", fontSize: 14 }}>Các biến có thể chèn vào cấu hình API:</strong>
+              <ul style={{ margin: 0, paddingLeft: "16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 24px" }}>
+                <li><code style={{ color: "#f87171", background: "rgba(0,0,0,0.2)", padding: "2px 6px", borderRadius: 4, marginRight: 4 }}>&lt;sdt here&gt;</code> Số điện thoại</li>
+                <li><code style={{ color: "#f87171", background: "rgba(0,0,0,0.2)", padding: "2px 6px", borderRadius: 4, marginRight: 4 }}>&lt;name here&gt;</code> Họ và tên</li>
+                <li><code style={{ color: "#f87171", background: "rgba(0,0,0,0.2)", padding: "2px 6px", borderRadius: 4, marginRight: 4 }}>&lt;result here&gt;</code> Kết quả</li>
+                <li><code style={{ color: "#f87171", background: "rgba(0,0,0,0.2)", padding: "2px 6px", borderRadius: 4, marginRight: 4 }}>&lt;score here&gt;</code> Điểm số</li>
+                <li><code style={{ color: "#f87171", background: "rgba(0,0,0,0.2)", padding: "2px 6px", borderRadius: 4, marginRight: 4 }}>&lt;duration here&gt;</code> Thời gian chơi</li>
+                <li><code style={{ color: "#f87171", background: "rgba(0,0,0,0.2)", padding: "2px 6px", borderRadius: 4, marginRight: 4 }}>&lt;moves here&gt;</code> Số bước đi</li>
               </ul>
             </div>
           )}
         </div>
 
-        <label style={{ fontSize: 14, fontWeight: "bold", marginBottom: 8 }}>Post API</label>
-        <textarea
-          value={config.apiPostUrl || ""}
-          onChange={(e) => setConfig({ ...config, apiPostUrl: e.target.value })}
-          placeholder="https://api.smax.ai/..."
-          rows={2}
-          style={{ fontFamily: "monospace", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #e9ecef", background: "#f8f9fa", resize: "vertical", marginBottom: 16 }}
-        />
+        <label style={{ display: "grid", gap: 10, fontSize: 15, fontWeight: 700, color: "#0f172a" }}>
+          Post API URL
+          <input
+            value={config.apiPostUrl || ""}
+            onChange={(e) => setConfig({ ...config, apiPostUrl: e.target.value })}
+            placeholder="https://api.smax.ai/..."
+            style={{ background: "#f8fafc", border: "1px solid #cbd4df", minHeight: 46, borderRadius: 8, padding: "0 16px", fontWeight: 400, color: "#0f172a", fontSize: 14 }}
+          />
+        </label>
 
-        <label style={{ fontSize: 14, fontWeight: "bold", marginBottom: 8 }}>Headers</label>
-        <textarea
-          value={config.apiHeaders || ""}
-          onChange={(e) => setConfig({ ...config, apiHeaders: e.target.value })}
-          placeholder='{\n  "Authorization": "Bearer ..."\n}'
-          rows={4}
-          style={{ fontFamily: "monospace", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #e9ecef", background: "#f8f9fa", resize: "vertical", marginBottom: 16 }}
-        />
+        <label style={{ display: "grid", gap: 10, fontSize: 15, fontWeight: 700, color: "#0f172a" }}>
+          Headers <span style={{ fontSize: 13, fontWeight: 400, color: "#64748b" }}>(Định dạng JSON)</span>
+          <textarea
+            value={config.apiHeaders || ""}
+            onChange={(e) => setConfig({ ...config, apiHeaders: e.target.value })}
+            placeholder={`{\n  "Authorization": "Bearer ..."\n}`}
+            rows={4}
+            style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px solid #cbd4df", background: "#f8fafc", resize: "vertical", fontSize: 13, lineHeight: 1.6, color: "#334155" }}
+          />
+        </label>
 
-        <label style={{ fontSize: 14, fontWeight: "bold", marginBottom: 8 }}>Body</label>
-        <textarea
-          value={config.apiBody || ""}
-          onChange={(e) => setConfig({ ...config, apiBody: e.target.value })}
-          placeholder='{\n  "sdt": "<sdt here>",\n  "page_id": "98732384813610746"\n}'
-          rows={8}
-          style={{ fontFamily: "monospace", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #e9ecef", background: "#f8f9fa", resize: "vertical", marginBottom: 16 }}
-        />
+        <label style={{ display: "grid", gap: 10, fontSize: 15, fontWeight: 700, color: "#0f172a" }}>
+          Body <span style={{ fontSize: 13, fontWeight: 400, color: "#64748b" }}>(Định dạng JSON)</span>
+          <textarea
+            value={config.apiBody || ""}
+            onChange={(e) => setConfig({ ...config, apiBody: e.target.value })}
+            placeholder={`{\n  "sdt": "<sdt here>",\n  "name": "<name here>"\n}`}
+            rows={8}
+            style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px solid #cbd4df", background: "#f8fafc", resize: "vertical", fontSize: 13, lineHeight: 1.6, color: "#334155" }}
+          />
+        </label>
         
-        <label style={{ fontSize: 14, fontWeight: "bold", marginBottom: 8, background: "#e9ecef", display: "inline-block", padding: "4px 8px", borderRadius: 4 }}>Hoặc Get API</label>
-        <textarea
-          value={config.apiGetUrl || ""}
-          onChange={(e) => setConfig({ ...config, apiGetUrl: e.target.value })}
-          placeholder="https://api.smax.ai/...&access_token=..."
-          rows={6}
-          style={{ fontFamily: "monospace", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #e9ecef", background: "#f8f9fa", resize: "vertical" }}
-        />
+        <div style={{ height: 1, background: "#e2e8f0", margin: "4px 0" }}></div>
 
-        <button onClick={save} disabled={loading} className="primary-red" style={{ marginTop: 24, alignSelf: "flex-start", padding: "10px 24px" }}>
-          {loading ? "Đang lưu..." : "Lưu cấu hình API"}
-        </button>
+        <label style={{ display: "grid", gap: 10, fontSize: 14, fontWeight: 600, color: "#64748b" }}>
+          Hoặc Get API <span style={{ fontSize: 13, fontWeight: 400, color: "#94a3b8" }}>(Sử dụng nếu không dùng Post)</span>
+          <textarea
+            value={config.apiGetUrl || ""}
+            onChange={(e) => setConfig({ ...config, apiGetUrl: e.target.value })}
+            placeholder="https://api.smax.ai/...&access_token=..."
+            rows={3}
+            style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px dashed #cbd4df", background: "#f1f5f9", resize: "vertical", fontSize: 13, lineHeight: 1.6, color: "#475569" }}
+          />
+        </label>
       </div>
     </section>
   );
