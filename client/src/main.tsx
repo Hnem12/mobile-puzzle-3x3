@@ -1205,6 +1205,7 @@ function History() {
         <table>
           <thead>
             <tr>
+              <th>Thứ hạng</th>
               <th>Người dùng</th>
               <th>Số điện thoại</th>
               <th>Kết quả</th>
@@ -1215,8 +1216,17 @@ function History() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
+            {rows.map((r, i) => (
               <tr key={r._id}>
+                <td>
+                  {r.result === "WIN" ? (
+                    <span style={{ fontWeight: i < 10 ? "bold" : "normal", color: i < 3 ? "#ef4444" : "inherit" }}>
+                      Top {i + 1}
+                    </span>
+                  ) : (
+                    "--"
+                  )}
+                </td>
                 <td>{r.userId?.fullName}</td>
                 <td>{r.userId?.phone}</td>
                 <td>
@@ -1522,18 +1532,19 @@ function ApiSettings() {
                     <thead>
                       <tr>
                         <th style={{ background: "transparent", color: "#94a3b8", fontSize: 12, textTransform: "uppercase", padding: "8px 12px", borderBottom: "1px solid #e2e8f0" }}>TÊN BIẾN</th>
-                        <th style={{ background: "transparent", color: "#94a3b8", fontSize: 12, textTransform: "uppercase", padding: "8px 12px", borderBottom: "1px solid #e2e8f0" }}>NHÓM</th>
+                        <th style={{ background: "transparent", color: "#94a3b8", fontSize: 12, textTransform: "uppercase", padding: "8px 12px", borderBottom: "1px solid #e2e8f0" }}>MÔ TẢ</th>
                         <th style={{ background: "transparent", color: "#94a3b8", fontSize: 12, textTransform: "uppercase", padding: "8px 12px", borderBottom: "1px solid #e2e8f0" }}>LOẠI DỮ LIỆU</th>
                       </tr>
                     </thead>
                     <tbody>
                       {[
-                        { code: "{{phone}}", group: "Thông tin người chơi", type: "TEXT" },
-                        { code: "{{name}}", group: "Thông tin người chơi", type: "TEXT" },
-                        { code: "{{result}}", group: "Kết quả chơi", type: "TEXT" },
-                        { code: "{{score}}", group: "Kết quả chơi", type: "NUMBER" },
-                        { code: "{{duration}}", group: "Kết quả chơi", type: "NUMBER" },
-                        { code: "{{moves}}", group: "Kết quả chơi", type: "NUMBER" }
+                        { code: "{{top}}", desc: "Thứ hạng", type: "NUMBER" },
+                        { code: "{{phone}}", desc: "Số điện thoại", type: "TEXT" },
+                        { code: "{{name}}", desc: "Tên người chơi", type: "TEXT" },
+                        { code: "{{result}}", desc: "Kết quả chơi (WIN/LOSE)", type: "TEXT" },
+                        { code: "{{moves}}", desc: "Bước di chuyển", type: "NUMBER" },
+                        { code: "{{duration}}", desc: "Thời gian", type: "NUMBER" },
+                        { code: "{{score}}", desc: "Điểm", type: "NUMBER" }
                       ].map(v => (
                         <tr key={v.code}>
                           <td style={{ padding: "12px", borderBottom: "1px solid #f1f5f9" }}>
@@ -1553,7 +1564,7 @@ function ApiSettings() {
                               {v.code}
                             </button>
                           </td>
-                          <td style={{ padding: "12px", borderBottom: "1px solid #f1f5f9", fontSize: 14, color: "#475569" }}>{v.group}</td>
+                          <td style={{ padding: "12px", borderBottom: "1px solid #f1f5f9", fontSize: 14, color: "#475569" }}>{v.desc}</td>
                           <td style={{ padding: "12px", borderBottom: "1px solid #f1f5f9", fontSize: 14, color: "#475569" }}>{v.type}</td>
                         </tr>
                       ))}
