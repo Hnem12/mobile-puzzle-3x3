@@ -1494,7 +1494,7 @@ function ApiSettings() {
         </button>
       </div>
       
-      <div className="admin-card stack" style={{ maxWidth: 760, padding: "32px 36px", gap: 28, borderRadius: 12 }}>
+      <div className="admin-card stack" style={{ maxWidth: 760, padding: "32px 36px", gap: 28, borderRadius: 12, flexDirection: "column", alignItems: "stretch" }}>
         
         <div style={{ alignSelf: "flex-start" }}>
           <button 
