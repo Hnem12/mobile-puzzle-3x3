@@ -1497,7 +1497,7 @@ function ApiSettings() {
 
   return (
     <section>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, maxWidth: 760 }}>
         <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#0f172a" }}>Cấu hình API</h1>
         <button onClick={save} disabled={loading} style={{ minHeight: 40, padding: "0 20px", background: "#0f172a", borderRadius: 8, fontSize: 14 }}>
           {loading ? "Đang lưu..." : "Lưu cấu hình"}
