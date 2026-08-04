@@ -275,7 +275,7 @@ function Register({
         <form onSubmit={submit} className="game-card stack red-glow">
           <label>
             <span className="label-with-icon">
-              <User size={14} /> HỌ VÀ TÊN *
+              <User size={14} /> HỌ VÀ TÊN*
             </span>
             <input
               required
@@ -286,7 +286,7 @@ function Register({
           </label>
           <label>
             <span className="label-with-icon">
-              <Phone size={14} /> SỐ ĐIỆN THOẠI *
+              <Phone size={14} /> SỐ ĐIỆN THOẠI*
             </span>
             <input
               required
@@ -444,25 +444,6 @@ function Puzzle({
       className="play-screen"
       style={{ "--racing-bg": `url(${formBg})` } as React.CSSProperties}
     >
-      <button
-        type="button"
-        onClick={onLogout}
-        style={{
-          position: "absolute",
-          top: 20,
-          right: 20,
-          background: "rgba(255,255,255,0.2)",
-          color: "#fff",
-          border: "none",
-          padding: "6px 12px",
-          borderRadius: 20,
-          fontSize: 12,
-          cursor: "pointer",
-          zIndex: 10,
-        }}
-      >
-        Đổi người chơi
-      </button>
       <BrandHeader />
 
       <div className="puzzle-header-info">
@@ -732,10 +713,7 @@ function Leaderboard({
 
   return (
     <main className="game-hero leaderboard-screen">
-      <section className="leaderboard-panel">
-        <button className="icon-back" onClick={onBack} aria-label="Quay lại">
-          <ChevronLeft size={18} />
-        </button>
+      <section className="leaderboard-panel"> 
         <BrandHeader />
         <div className="leaderboard-header-title">
           <h1>
