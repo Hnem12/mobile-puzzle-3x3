@@ -713,7 +713,10 @@ function Leaderboard({
 
   return (
     <main className="game-hero leaderboard-screen">
-      <section className="leaderboard-panel"> 
+      <section className="leaderboard-panel">
+        <button className="icon-back" onClick={onBack} aria-label="Quay lại">
+          <ChevronLeft size={18} />
+        </button>
         <BrandHeader />
         <div className="leaderboard-header-title">
           <h1>
