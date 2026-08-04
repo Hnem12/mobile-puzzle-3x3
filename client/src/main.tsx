@@ -1502,7 +1502,7 @@ function ApiSettings() {
         const baseUrl = parts[0];
         const query = parts.slice(1).join('?');
         const params = query.split('&');
-        const formattedParams = params.map(p => {
+        const formattedParams = params.map((p: string) => {
           const eqIdx = p.indexOf('=');
           if (eqIdx > -1) {
             const key = p.substring(0, eqIdx);
