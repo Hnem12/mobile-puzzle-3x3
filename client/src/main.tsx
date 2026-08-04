@@ -1480,6 +1480,47 @@ function ApiSettings() {
       });
   }, []);
 
+  const handleFormatJson = (field: "apiHeaders" | "apiBody") => {
+    try {
+      if (config[field]) {
+        const parsed = JSON.parse(config[field]);
+        setConfig((prev: any) => ({ ...prev, [field]: JSON.stringify(parsed, null, 2) }));
+      }
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  const handleFormatGetUrl = () => {
+    try {
+      if (!config.apiGetUrl) return;
+      let url = config.apiGetUrl;
+      try { url = decodeURI(url); } catch(e) {}
+      
+      const parts = url.split('?');
+      if (parts.length > 1) {
+        const baseUrl = parts[0];
+        const query = parts.slice(1).join('?');
+        const params = query.split('&');
+        const formattedParams = params.map(p => {
+          const eqIdx = p.indexOf('=');
+          if (eqIdx > -1) {
+            const key = p.substring(0, eqIdx);
+            const val = p.substring(eqIdx + 1);
+            try {
+              let parsed = JSON.parse(decodeURIComponent(val));
+              if (typeof parsed === 'object' && parsed !== null) {
+                return `${key}=${JSON.stringify(parsed, null, 2)}`;
+              }
+            } catch (e) {}
+          }
+          return p;
+        });
+        setConfig((prev: any) => ({ ...prev, apiGetUrl: `${baseUrl}?${formattedParams.join('&')}` }));
+      }
+    } catch (e) {}
+  };
+
   async function save() {
     setLoading(true);
     try {
@@ -1593,6 +1634,7 @@ function ApiSettings() {
           <textarea
             value={config.apiHeaders || ""}
             onChange={(e) => setConfig({ ...config, apiHeaders: e.target.value })}
+            onBlur={() => handleFormatJson("apiHeaders")}
             placeholder={`{\n  "Authorization": "Bearer ..."\n}`}
             rows={4}
             style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px solid #cbd4df", background: "#f8fafc", resize: "vertical", overflowY: "auto", fontSize: 13, lineHeight: 1.6, color: "#334155" }}
@@ -1604,6 +1646,7 @@ function ApiSettings() {
           <textarea
             value={config.apiBody || ""}
             onChange={(e) => setConfig({ ...config, apiBody: e.target.value })}
+            onBlur={() => handleFormatJson("apiBody")}
             placeholder={`{\n  "sdt": "<sdt here>",\n  "name": "<name here>"\n}`}
             rows={8}
             style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px solid #cbd4df", background: "#f8fafc", resize: "vertical", overflowY: "auto", fontSize: 13, lineHeight: 1.6, color: "#334155" }}
@@ -1617,6 +1660,7 @@ function ApiSettings() {
           <textarea
             value={config.apiGetUrl || ""}
             onChange={(e) => setConfig({ ...config, apiGetUrl: e.target.value })}
+            onBlur={handleFormatGetUrl}
             placeholder="https://api.smax.ai/...&access_token=..."
             rows={3}
             style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px dashed #cbd4df", background: "#f1f5f9", resize: "vertical", overflowY: "auto", fontSize: 13, lineHeight: 1.6, color: "#475569" }}
