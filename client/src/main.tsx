@@ -937,7 +937,7 @@ function Admin() {
           Cấu hình API
         </button>
         <div style={{ marginLeft: "auto", display: "flex", gap: 10 }}>
-          <button
+          {/* <button
             onClick={exportNocodb}
             disabled={exporting}
             style={{
@@ -950,7 +950,7 @@ function Admin() {
             }}
           >
             {exporting ? "Đang xuất..." : "Xuất dữ liệu vào Nocodb"}
-          </button>
+          </button> */}
           <button
             onClick={handleLogout}
             style={{
@@ -1220,6 +1220,21 @@ function History() {
     link.click();
     URL.revokeObjectURL(url);
   }
+
+  async function exportNocodb() {
+    if (!window.confirm("Bạn có chắc chắn muốn xuất toàn bộ dữ liệu sang NocoDB?")) return;
+    try {
+      const res = await fetch(`${API}/admin/nocodb/export`, {
+        method: "POST",
+        headers: auth(),
+      });
+      const data = await res.json();
+      alert(data.message || "Đã xuất dữ liệu thành công");
+    } catch (e) {
+      alert("Lỗi khi xuất dữ liệu sang NocoDB.");
+    }
+  }
+
   return (
     <section>
       <h1>Lịch sử chơi</h1>
@@ -1231,6 +1246,9 @@ function History() {
         />
         <button type="button" onClick={exportExcel}>
           <Download size={18} /> Xuất Excel
+        </button>
+        <button type="button" onClick={exportNocodb}>
+          <Download size={18} /> Xuất NocoDB
         </button>
       </div>
       <p>
@@ -1311,6 +1329,21 @@ function Users() {
     link.click();
     URL.revokeObjectURL(url);
   }
+
+  async function exportNocodb() {
+    if (!window.confirm("Bạn có chắc chắn muốn xuất toàn bộ dữ liệu sang NocoDB?")) return;
+    try {
+      const res = await fetch(`${API}/admin/nocodb/export`, {
+        method: "POST",
+        headers: auth(),
+      });
+      const data = await res.json();
+      alert(data.message || "Đã xuất dữ liệu thành công");
+    } catch (e) {
+      alert("Lỗi khi xuất dữ liệu sang NocoDB.");
+    }
+  }
+
   return (
     <section>
       <h1>Thông tin người chơi</h1>
@@ -1322,6 +1355,9 @@ function Users() {
         />
         <button type="button" onClick={exportExcel}>
           <Download size={18} /> Xuất Excel
+        </button>
+        <button type="button" onClick={exportNocodb}>
+          <Download size={18} /> Xuất NocoDB
         </button>
       </div>
       <p>
