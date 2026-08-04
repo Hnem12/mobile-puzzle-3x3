@@ -62,6 +62,17 @@ app.get("/", (req, res) => {
   });
 });
 
+// Middleware để tự động thêm Content-Type: application/json nếu người dùng quên truyền
+app.use((req, res, next) => {
+  if (
+    !req.headers["content-type"] &&
+    ["POST", "PUT", "PATCH"].includes(req.method)
+  ) {
+    req.headers["content-type"] = "application/json";
+  }
+  next();
+});
+
 app.use(express.json());
 
 app.post("/api/auth/login", (req, res) => {
@@ -91,7 +102,7 @@ app.post(
   async (req, res) => {
     if (!req.file)
       return res.status(400).json({ message: "Image is required" });
-      
+
     const b64 = req.file.buffer.toString("base64");
     const dataURI = `data:${req.file.mimetype};base64,${b64}`;
 
@@ -143,39 +154,44 @@ app.put("/api/admin/settings", requireAdmin, async (req, res) => {
 
 app.get("/api/admin/users", requireAdmin, async (req, res) => {
   const q = String(req.query.q || "").toLowerCase();
-  const filter = q ? {
-    $or: [
-      { fullName: { $regex: q, $options: "i" } },
-      { phone: { $regex: q, $options: "i" } },
-    ]
-  } : {};
+  const filter = q
+    ? {
+        $or: [
+          { fullName: { $regex: q, $options: "i" } },
+          { phone: { $regex: q, $options: "i" } },
+        ],
+      }
+    : {};
   res.json(await User.find(filter).sort({ createdAt: -1 }));
 });
 
 app.get("/api/admin/users/export", requireAdmin, async (req, res) => {
   const q = String(req.query.q || "").toLowerCase();
-  const filter = q ? {
-    $or: [
-      { fullName: { $regex: q, $options: "i" } },
-      { phone: { $regex: q, $options: "i" } },
-    ]
-  } : {};
+  const filter = q
+    ? {
+        $or: [
+          { fullName: { $regex: q, $options: "i" } },
+          { phone: { $regex: q, $options: "i" } },
+        ],
+      }
+    : {};
   const users = await User.find(filter).sort({ createdAt: -1 }).lean();
   const rows = users.map((u: any) => ({
     "Họ và tên": u.fullName,
     "Số điện thoại": u.phone,
     "Địa chỉ": u.address || "",
-    "Loại KH": u.customerType === "agency" ? "Khách hàng đại lý" : "Khách hàng mua lẻ",
-    "Sản phẩm quan tâm": u.productOfInterest === "kingsport" ? "Kingsport" : "Xe điện MOVE",
-    "Ngày đăng ký": u.createdAt ? new Date(u.createdAt).toISOString().slice(0, 10) : "",
+    "Loại KH":
+      u.customerType === "agency" ? "Khách hàng đại lý" : "Khách hàng mua lẻ",
+    "Sản phẩm quan tâm":
+      u.productOfInterest === "kingsport" ? "Kingsport" : "Xe điện MOVE",
+    "Ngày đăng ký": u.createdAt
+      ? new Date(u.createdAt).toISOString().slice(0, 10)
+      : "",
   }));
   const sheet = XLSX.utils.json_to_sheet(rows);
   const book = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(book, sheet, "Users");
-  res.setHeader(
-    "Content-Disposition",
-    "attachment; filename=users.xlsx",
-  );
+  res.setHeader("Content-Disposition", "attachment; filename=users.xlsx");
   res.end(XLSX.write(book, { type: "buffer", bookType: "xlsx" }));
 });
 
@@ -232,7 +248,7 @@ app.post("/api/game/register", async (req, res) => {
       phone: z.string().trim().min(8, "Số điện thoại không hợp lệ"),
       address: z.string().optional(),
       customerType: z.enum(["retail", "agency"]).optional(),
-      productOfInterest: z.enum(["move", "kingsport"]).optional()
+      productOfInterest: z.enum(["move", "kingsport"]).optional(),
     })
     .safeParse(req.body);
   if (!parsed.success)
@@ -291,14 +307,15 @@ app.post("/api/game/histories", async (req, res) => {
       if (settings.apiPostUrl || settings.apiGetUrl) {
         const user = await User.findById(parsed.data.userId);
         if (user && user.phone) {
-          
           let userRank = "--";
           if (parsed.data.result === "WIN") {
             const allWins = await GameHistory.find({ result: "WIN" })
               .sort({ duration: 1, score: -1, moves: 1 })
               .select("_id")
               .lean();
-            const idx = allWins.findIndex((w: any) => String(w._id) === String(history._id));
+            const idx = allWins.findIndex(
+              (w: any) => String(w._id) === String(history._id),
+            );
             if (idx >= 0) userRank = String(idx + 1);
           }
 
@@ -317,13 +334,16 @@ app.post("/api/game/histories", async (req, res) => {
             let bodyStr = settings.apiBody || "";
             bodyStr = replacePlaceholders(bodyStr);
             let postUrl = replacePlaceholders(settings.apiPostUrl);
-            
+
             let headersObj: Record<string, string> = {
-              "Content-Type": "application/json"
+              "Content-Type": "application/json",
             };
             if (settings.apiHeaders) {
               try {
-                headersObj = { ...headersObj, ...JSON.parse(settings.apiHeaders) };
+                headersObj = {
+                  ...headersObj,
+                  ...JSON.parse(settings.apiHeaders),
+                };
               } catch (e) {
                 console.error("Error parsing API Headers:", e);
               }
@@ -332,22 +352,26 @@ app.post("/api/game/histories", async (req, res) => {
             const zbsRes = await fetch(postUrl, {
               method: "POST",
               headers: headersObj,
-              body: bodyStr
+              body: bodyStr,
             });
             const textRes = await zbsRes.text();
             console.log("ZBS Trigger POST status:", zbsRes.status, textRes);
           } else if (settings.apiGetUrl) {
             let urlStr = replacePlaceholders(settings.apiGetUrl);
-            
+
             // Encode the URL to handle spaces and raw JSON characters in the query
             // Ignore encoding if it somehow fails, but encodeURI is usually safe.
             let finalUrl = urlStr;
             try {
               finalUrl = encodeURI(urlStr);
-            } catch(e) {}
-            
+            } catch (e) {}
+
             const zbsRes = await fetch(finalUrl, { method: "GET" });
-            console.log("ZBS Trigger GET status:", zbsRes.status, await zbsRes.text());
+            console.log(
+              "ZBS Trigger GET status:",
+              zbsRes.status,
+              await zbsRes.text(),
+            );
           }
         }
       }
@@ -374,7 +398,7 @@ async function queryHistories(query: Record<string, unknown>) {
     if (query.to) playedAt.$lte = new Date(String(query.to));
     match.playedAt = playedAt;
   }
-  
+
   const allWins = await GameHistory.find({ result: "WIN" })
     .sort({ duration: 1, score: -1, moves: 1 })
     .select("_id")
@@ -387,22 +411,24 @@ async function queryHistories(query: Record<string, unknown>) {
     .populate("levelId")
     .sort({ playedAt: -1 })
     .lean();
-    
-  return rows.map((row: any) => {
-    if (row.result === "WIN") {
-      row.rank = winRanks.get(String(row._id));
-    }
-    return row;
-  }).filter((row: any) => {
-    const user = row.userId || {};
-    return (
-      (!query.name ||
-        user.fullName
-          ?.toLowerCase()
-          .includes(String(query.name).toLowerCase())) &&
-      (!query.phone || user.phone?.includes(String(query.phone)))
-    );
-  });
+
+  return rows
+    .map((row: any) => {
+      if (row.result === "WIN") {
+        row.rank = winRanks.get(String(row._id));
+      }
+      return row;
+    })
+    .filter((row: any) => {
+      const user = row.userId || {};
+      return (
+        (!query.name ||
+          user.fullName
+            ?.toLowerCase()
+            .includes(String(query.name).toLowerCase())) &&
+        (!query.phone || user.phone?.includes(String(query.phone)))
+      );
+    });
 }
 
 function formatHistory(row: any) {
@@ -471,7 +497,7 @@ async function leaderboard(levelId?: string) {
 }
 
 mongoose.connect(process.env.MONGO_URI as string).then(async () => {
-  if (await GameLevel.countDocuments() === 0) {
+  if ((await GameLevel.countDocuments()) === 0) {
     await GameLevel.create({
       name: "Easy",
       timeLimit: 90,
@@ -485,11 +511,12 @@ mongoose.connect(process.env.MONGO_URI as string).then(async () => {
     });
     console.log("Seeded default Easy level.");
   }
-  
-  if (await GameImage.countDocuments() === 0) {
+
+  if ((await GameImage.countDocuments()) === 0) {
     await GameImage.create({
       name: "Move SECC Demo",
-      imageUrl: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80",
+      imageUrl:
+        "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80",
       status: "ACTIVE",
       gridSize: 3,
     });

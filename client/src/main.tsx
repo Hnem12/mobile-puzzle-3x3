@@ -1595,7 +1595,7 @@ function ApiSettings() {
             onChange={(e) => setConfig({ ...config, apiHeaders: e.target.value })}
             placeholder={`{\n  "Authorization": "Bearer ..."\n}`}
             rows={4}
-            style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px solid #cbd4df", background: "#f8fafc", resize: "vertical", fontSize: 13, lineHeight: 1.6, color: "#334155" }}
+            style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px solid #cbd4df", background: "#f8fafc", resize: "vertical", overflowY: "auto", fontSize: 13, lineHeight: 1.6, color: "#334155" }}
           />
         </label>
 
@@ -1606,7 +1606,7 @@ function ApiSettings() {
             onChange={(e) => setConfig({ ...config, apiBody: e.target.value })}
             placeholder={`{\n  "sdt": "<sdt here>",\n  "name": "<name here>"\n}`}
             rows={8}
-            style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px solid #cbd4df", background: "#f8fafc", resize: "vertical", fontSize: 13, lineHeight: 1.6, color: "#334155" }}
+            style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px solid #cbd4df", background: "#f8fafc", resize: "vertical", overflowY: "auto", fontSize: 13, lineHeight: 1.6, color: "#334155" }}
           />
         </label>
         
@@ -1619,7 +1619,7 @@ function ApiSettings() {
             onChange={(e) => setConfig({ ...config, apiGetUrl: e.target.value })}
             placeholder="https://api.smax.ai/...&access_token=..."
             rows={3}
-            style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px dashed #cbd4df", background: "#f1f5f9", resize: "vertical", fontSize: 13, lineHeight: 1.6, color: "#475569" }}
+            style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px dashed #cbd4df", background: "#f1f5f9", resize: "vertical", overflowY: "auto", fontSize: 13, lineHeight: 1.6, color: "#475569" }}
           />
         </label>
       </div>
