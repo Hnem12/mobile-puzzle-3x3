@@ -213,28 +213,43 @@ app.post("/api/admin/nocodb/export", requireAdmin, async (req, res) => {
   try {
     // 1. Lấy toàn bộ dữ liệu hiện có trên NocoDB và xóa
     try {
-      const getRes = await fetch("https://nocodb.smax.in/api/v2/tables/mvnjqxm4bfa4qtn/records?limit=1000", {
-        headers: { "xc-token": "9XcWdwwaxAznbxKwmx-wcwQI81K9vC3JD7GtK0ot" }
-      });
+      const getRes = await fetch(
+        "https://nocodb.smax.in/api/v2/tables/mvnjqxm4bfa4qtn/records?limit=1000",
+        {
+          headers: { "xc-token": "9XcWdwwaxAznbxKwmx-wcwQI81K9vC3JD7GtK0ot" },
+        },
+      );
       const oldData = await getRes.json();
       if (oldData && oldData.list && oldData.list.length > 0) {
         const recordsToDelete = oldData.list.map((r: any) => ({ Id: r.Id }));
-        await fetch("https://nocodb.smax.in/api/v2/tables/mvnjqxm4bfa4qtn/records", {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            "xc-token": "9XcWdwwaxAznbxKwmx-wcwQI81K9vC3JD7GtK0ot"
+        await fetch(
+          "https://nocodb.smax.in/api/v2/tables/mvnjqxm4bfa4qtn/records",
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              "xc-token": "9XcWdwwaxAznbxKwmx-wcwQI81K9vC3JD7GtK0ot",
+            },
+            body: JSON.stringify(recordsToDelete),
           },
-          body: JSON.stringify(recordsToDelete)
-        });
-        console.log("Đã xóa", recordsToDelete.length, "bản ghi cũ trên NocoDB.");
+        );
+        console.log(
+          "Đã xóa",
+          recordsToDelete.length,
+          "bản ghi cũ trên NocoDB.",
+        );
       }
     } catch (e) {
       console.error("Lỗi khi xóa data NocoDB cũ:", e);
     }
 
-    // 2. Xuất dữ liệu mới
     const rows = await queryHistories({});
+    rows.sort((a: any, b: any) => {
+      const rankA = a.rank ?? Infinity;
+      const rankB = b.rank ?? Infinity;
+      return rankA - rankB;
+    });
+
     let successCount = 0;
     for (const r of rows) {
       const user = r.userId || {};
@@ -243,26 +258,34 @@ app.post("/api/admin/nocodb/export", requireAdmin, async (req, res) => {
         phone_number: user.phone || "",
         address: user.address || "",
         shopping_need: user.customerType === "agency" ? "đại lý" : "khách lẻ",
-        interested_product: user.productOfInterest === "kingsport" ? "Kingsport" : "xe điện",
+        interested_product:
+          user.productOfInterest === "kingsport" ? "Kingsport" : "xe điện",
         result: r.result === "WIN" ? "Hoàn thành" : "Thất bại",
         rank: r.rank ? String(r.rank) : "",
         score: String(r.score || 0),
         completion_time: String(r.duration || 0),
         steps: String(r.moves || 0),
-        played_at: new Date(r.playedAt || new Date()).toLocaleDateString("en-GB")
+        played_at: new Date(r.playedAt || new Date()).toLocaleDateString(
+          "en-GB",
+        ),
       };
-      
-      await fetch("https://nocodb.smax.in/api/v2/tables/mvnjqxm4bfa4qtn/records", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "xc-token": "9XcWdwwaxAznbxKwmx-wcwQI81K9vC3JD7GtK0ot"
+
+      await fetch(
+        "https://nocodb.smax.in/api/v2/tables/mvnjqxm4bfa4qtn/records",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "xc-token": "9XcWdwwaxAznbxKwmx-wcwQI81K9vC3JD7GtK0ot",
+          },
+          body: JSON.stringify(nocodbData),
         },
-        body: JSON.stringify(nocodbData)
-      });
+      );
       successCount++;
     }
-    res.json({ message: `Đã xóa dữ liệu cũ và xuất ${successCount} bản ghi sang NocoDB.` });
+    res.json({
+      message: `Đã xóa dữ liệu cũ và xuất ${successCount} bản ghi sang NocoDB.`,
+    });
   } catch (error) {
     console.error("Export NocoDB error:", error);
     res.status(500).json({ message: "Có lỗi khi xuất dữ liệu sang NocoDB." });
@@ -384,24 +407,31 @@ app.post("/api/game/histories", async (req, res) => {
               full_name: user.fullName || "",
               phone_number: user.phone || "",
               address: user.address || "",
-              shopping_need: user.customerType === "agency" ? "đại lý" : "khách lẻ",
-              interested_product: user.productOfInterest === "kingsport" ? "Kingsport" : "xe điện",
+              shopping_need:
+                user.customerType === "agency" ? "đại lý" : "khách lẻ",
+              interested_product:
+                user.productOfInterest === "kingsport"
+                  ? "Kingsport"
+                  : "xe điện",
               result: parsed.data.result === "WIN" ? "Hoàn thành" : "Thất bại",
               rank: userRank === "--" ? "" : userRank,
               score: String(parsed.data.score),
               completion_time: String(parsed.data.duration),
               steps: String(parsed.data.moves),
-              played_at: new Date().toLocaleDateString("en-GB")
+              played_at: new Date().toLocaleDateString("en-GB"),
             };
-            
-            await fetch("https://nocodb.smax.in/api/v2/tables/mvnjqxm4bfa4qtn/records", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "xc-token": "9XcWdwwaxAznbxKwmx-wcwQI81K9vC3JD7GtK0ot"
+
+            await fetch(
+              "https://nocodb.smax.in/api/v2/tables/mvnjqxm4bfa4qtn/records",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "xc-token": "9XcWdwwaxAznbxKwmx-wcwQI81K9vC3JD7GtK0ot",
+                },
+                body: JSON.stringify(nocodbData),
               },
-              body: JSON.stringify(nocodbData)
-            });
+            );
             console.log("Sync NocoDB success");
           } catch (e) {
             console.error("Sync NocoDB error:", e);
