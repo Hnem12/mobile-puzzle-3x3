@@ -75,7 +75,7 @@ input, select {
   flex-direction: column;
   gap: 18px;
   margin: 0 auto;
-  max-width: 360px;
+  max-width: 430px;
   min-height: 100svh;
   padding: 16px 24px 32px;
   position: relative;
@@ -161,10 +161,14 @@ input, select {
   background: rgba(255,255,255,.04);
   border: 1px solid rgba(255,255,255,.1);
   color: white;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 0 8px;
-  min-height: 40px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 .radio-group button.active {
   background: rgba(239, 28, 48, 0.1);
