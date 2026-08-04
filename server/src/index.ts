@@ -211,6 +211,29 @@ app.get("/api/admin/histories/export", requireAdmin, async (req, res) => {
 });
 app.post("/api/admin/nocodb/export", requireAdmin, async (req, res) => {
   try {
+    // 1. Lấy toàn bộ dữ liệu hiện có trên NocoDB và xóa
+    try {
+      const getRes = await fetch("https://nocodb.smax.in/api/v2/tables/mvnjqxm4bfa4qtn/records?limit=1000", {
+        headers: { "xc-token": "9XcWdwwaxAznbxKwmx-wcwQI81K9vC3JD7GtK0ot" }
+      });
+      const oldData = await getRes.json();
+      if (oldData && oldData.list && oldData.list.length > 0) {
+        const recordsToDelete = oldData.list.map((r: any) => ({ Id: r.Id }));
+        await fetch("https://nocodb.smax.in/api/v2/tables/mvnjqxm4bfa4qtn/records", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            "xc-token": "9XcWdwwaxAznbxKwmx-wcwQI81K9vC3JD7GtK0ot"
+          },
+          body: JSON.stringify(recordsToDelete)
+        });
+        console.log("Đã xóa", recordsToDelete.length, "bản ghi cũ trên NocoDB.");
+      }
+    } catch (e) {
+      console.error("Lỗi khi xóa data NocoDB cũ:", e);
+    }
+
+    // 2. Xuất dữ liệu mới
     const rows = await queryHistories({});
     let successCount = 0;
     for (const r of rows) {
@@ -239,7 +262,7 @@ app.post("/api/admin/nocodb/export", requireAdmin, async (req, res) => {
       });
       successCount++;
     }
-    res.json({ message: `Đã xuất ${successCount} bản ghi sang NocoDB.` });
+    res.json({ message: `Đã xóa dữ liệu cũ và xuất ${successCount} bản ghi sang NocoDB.` });
   } catch (error) {
     console.error("Export NocoDB error:", error);
     res.status(500).json({ message: "Có lỗi khi xuất dữ liệu sang NocoDB." });

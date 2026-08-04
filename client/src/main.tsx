@@ -883,6 +883,26 @@ function Admin() {
   };
 
   if (!token) return <Login onDone={setToken} />;
+  const [exporting, setExporting] = useState(false);
+
+  async function exportNocodb() {
+    if (!window.confirm("Bạn có chắc chắn muốn xuất toàn bộ lịch sử chơi sang NocoDB?")) return;
+    setExporting(true);
+    try {
+      const res = await fetch(`${API}/admin/nocodb/export`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken") || ""}`
+        },
+      });
+      const data = await res.json();
+      alert(data.message || "Đã xuất dữ liệu thành công");
+    } catch (e) {
+      alert("Lỗi khi xuất dữ liệu sang NocoDB.");
+    }
+    setExporting(false);
+  }
+
   return (
     <main className="admin">
       <nav className="admin-nav">
@@ -916,17 +936,32 @@ function Admin() {
         >
           Cấu hình API
         </button>
-        <button
-          onClick={handleLogout}
-          style={{
-            marginLeft: "auto",
-            background: "transparent",
-            color: "inherit",
-            border: "1px solid rgba(255,255,255,0.2)",
-          }}
-        >
-          Đăng xuất
-        </button>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 10 }}>
+          <button
+            onClick={exportNocodb}
+            disabled={exporting}
+            style={{
+              background: "#3b82f6",
+              color: "#fff",
+              border: "none",
+              padding: "0 15px",
+              borderRadius: "6px",
+              fontWeight: 500,
+            }}
+          >
+            {exporting ? "Đang xuất..." : "Xuất dữ liệu vào Nocodb"}
+          </button>
+          <button
+            onClick={handleLogout}
+            style={{
+              background: "transparent",
+              color: "inherit",
+              border: "1px solid rgba(255,255,255,0.2)",
+            }}
+          >
+            Đăng xuất
+          </button>
+        </div>
       </nav>
       {tab === "images" && <Images />}
       {tab === "history" && <History />}
@@ -1536,36 +1571,13 @@ function ApiSettings() {
     setLoading(false);
   }
 
-  const [exporting, setExporting] = useState(false);
-
-  async function exportNocodb() {
-    if (!window.confirm("Bạn có chắc chắn muốn xuất toàn bộ lịch sử chơi sang NocoDB?")) return;
-    setExporting(true);
-    try {
-      const res = await fetch(`${API}/admin/nocodb/export`, {
-        method: "POST",
-        headers: auth(),
-      });
-      const data = await res.json();
-      alert(data.message || "Đã xuất dữ liệu thành công");
-    } catch (e) {
-      alert("Lỗi khi xuất dữ liệu sang NocoDB.");
-    }
-    setExporting(false);
-  }
-
   return (
     <section>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, width: "100%" }}>
         <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#0f172a" }}>Cấu hình API</h1>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={exportNocodb} disabled={exporting} style={{ minHeight: 40, padding: "0 20px", background: "#3b82f6", borderRadius: 8, fontSize: 14 }}>
-            {exporting ? "Đang xuất..." : "Xuất dữ liệu vào Nocodb"}
-          </button>
-          <button onClick={save} disabled={loading} style={{ minHeight: 40, padding: "0 20px", background: "#0f172a", borderRadius: 8, fontSize: 14 }}>
-            {loading ? "Đang lưu..." : "Lưu cấu hình"}
-          </button>
-        </div>
+        <button onClick={save} disabled={loading} style={{ minHeight: 40, padding: "0 20px", background: "#0f172a", borderRadius: 8, fontSize: 14 }}>
+          {loading ? "Đang lưu..." : "Lưu cấu hình"}
+        </button>
       </div>
       
       <div className="admin-card stack" style={{ width: "100%", maxHeight: "calc(100vh - 200px)", overflowY: "auto", padding: "32px 36px", gap: 28, borderRadius: 12, flexDirection: "column", flexWrap: "nowrap", alignItems: "stretch" }}>
