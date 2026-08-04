@@ -317,14 +317,14 @@ function Register({
               className={customerType === "retail" ? "active" : ""}
               onClick={() => setCustomerType("retail")}
             >
-              <User size={16} /> <span>Khách hàng<br />mua lẻ</span>
+              <User size={16} /> <span style={{ fontSize: "11px" }}>Khách hàng mua lẻ</span>
             </button>
             <button
               type="button"
               className={customerType === "agency" ? "active" : ""}
               onClick={() => setCustomerType("agency")}
             >
-              <Store size={16} /> <span>Khách hàng<br />đại lý</span>
+              <Store size={16} /> <span style={{ fontSize: "11px" }}>Khách hàng đại lý</span>
             </button>
           </div>
 
@@ -347,10 +347,10 @@ function Register({
           </div>
 
           {error && <p className="error">{error}</p>}
-          <button className="primary-red" disabled={disabled} style={{ minHeight: "54px", fontSize: "16px", marginTop: "12px", borderRadius: "8px" }}>
+          <button className="primary-red" disabled={disabled} style={{ minHeight: "54px", fontSize: "15px", marginTop: "12px", borderRadius: "8px" }}>
             BẮT ĐẦU CHƠI NGAY
           </button>
-          <p className="privacy-note">
+          <p className="privacy-note" style={{ fontSize: "10px" }}>
             Thông tin này chỉ được sử dụng với mục đích ghi nhận quà tặng sau
             trò chơi
           </p>
