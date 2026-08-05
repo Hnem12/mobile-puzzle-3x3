@@ -796,9 +796,6 @@ function Leaderboard({
   return (
     <main className="game-hero leaderboard-screen">
       <section className="leaderboard-panel">
-        <button className="icon-back" onClick={onBack} aria-label="Quay lại">
-          <ChevronLeft size={18} />
-        </button>
         <BrandHeader />
         <div className="leaderboard-header-title">
           <h1>
@@ -811,7 +808,7 @@ function Leaderboard({
             THE FASTER HAND
           </p>
         </div>
-        <div className="top-board">
+        <div className="leaderboard-top-board">
           {podium.map((row, i) => (
             <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
               <div className="prize-orb">
