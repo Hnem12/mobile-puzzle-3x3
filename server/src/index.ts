@@ -614,7 +614,7 @@ async function leaderboard(levelId?: string) {
   ]);
 }
 
-mongoose.connect(process.env.MONGO_URI as string).then(async () => {
+mongoose.connect(process.env.MONGO_URI as string, { family: 4 }).then(async () => {
   if ((await GameLevel.countDocuments()) === 0) {
     await GameLevel.create({
       name: "Easy",

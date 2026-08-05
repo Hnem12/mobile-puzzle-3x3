@@ -880,9 +880,10 @@ function LedScreen() {
         <div className="led-header">
           <div className="led-brand-box">
             <img src={logoMove} alt="Move" className="led-logo" />
-            <X size={16} strokeWidth={3} color="#000" className="led-cross" />
+            <X size={32} strokeWidth={3} color="#94a3b8" className="led-cross" />
             <img src={logoKingsport} alt="Kingsport" className="led-logo" />
           </div>
+          <Zap fill="#ef1c30" color="#ef1c30" size={56} strokeWidth={3} className="led-zap" />
           <h1 className="led-title-main">MOVE TO BE KING</h1>
           <h2 className="led-title-sub">THE FASTER HAND</h2>
         </div>
@@ -892,8 +893,12 @@ function LedScreen() {
           {podium.map((row, i) => (
             <div className={`led-top-card led-pos-${i + 1}`} key={podiumLabels[i]}>
               <div className="led-orb">
-                <span className="led-orb-text">{['HC Bạc', 'HC Vàng', 'HC Đồng'][i]}</span>
+                <img
+                  src={[imgTop2, imgTop1, imgTop3][i]}
+                  alt={podiumLabels[i]}
+                />
               </div>
+              <strong className="led-rank-label">TOP {i === 0 ? 2 : i === 1 ? 1 : 3}</strong>
               <strong className="led-name">{row?.fullName || "Đang chờ"}</strong>
               <time className="led-time">{formatTime(row?.bestDuration)}</time>
             </div>
@@ -906,21 +911,15 @@ function LedScreen() {
             {rest.length ? (
               rest.map((r, i) => (
                 <div className="led-rank-row" key={r.phone || i}>
-                  <div className="led-rank-index">{i + 4}</div>
-                  <div className="led-rank-info">
-                    <span className="led-rank-name">{r.fullName}</span>
-                    <span className="led-rank-phone">{maskPhone(r.phone)}</span>
-                  </div>
+                  <div className="led-rank-index">{String(i + 4).padStart(2, '0')}</div>
+                  <div className="led-rank-name">{r.fullName}</div>
                   <div className="led-rank-time">{formatTime(r.bestDuration)}</div>
                 </div>
               ))
             ) : (
               <div className="led-rank-row">
-                <div className="led-rank-index">4</div>
-                <div className="led-rank-info">
-                  <span className="led-rank-name">Chưa có thêm người chơi</span>
-                  <span className="led-rank-phone">--</span>
-                </div>
+                <div className="led-rank-index">04</div>
+                <div className="led-rank-name">Chưa có thêm người chơi</div>
                 <div className="led-rank-time">--</div>
               </div>
             )}
@@ -930,10 +929,16 @@ function LedScreen() {
         {/* Footer */}
         <div className="led-footer">
           <div className="led-rules-box">
-            <p><b>[Cúp vàng]</b> Giải nhất: 01 Xe máy điện Athena</p>
-            <p><b>[Cúp bạc]</b> Giải nhì: Máy massage cầm tay Kingsport</p>
-            <p><b>[Cúp đồng]</b> Giải ba: Máy massage cầm tay Kingsport</p>
-            <p><b>[Huân chương]</b> Giải phá kỷ lục: Chờ tên quà bên King</p>
+            <h3 className="led-rules-title">THỂ LỆ QUÀ TẶNG</h3>
+            <p className="led-rules-desc">
+              Người chơi phá kỷ lục Top 3 tại thời điểm tham gia sẽ<br/>
+              nhận ngay quà tặng độc quyền từ thương hiệu.<br/>
+              Kết thúc chương trình, Top 3 chung cuộc trên bảng xếp<br/>
+              hạng sẽ nhận:
+            </p>
+            <p><b>Top 1:</b> 01 xe máy điện MOVE Athena</p>
+            <p><b>Top 2:</b> 01 máy massage cầm tay Kingsport</p>
+            <p><b>Top 3:</b> 01 máy massage cầm tay Kingsport</p>
           </div>
           <div className="led-qr-section">
             <div className="led-qr-bg">
