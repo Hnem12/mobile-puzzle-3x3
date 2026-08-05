@@ -706,8 +706,7 @@ function Result({
                     <span className="prize-orb-text">{podiumLabels[i]}</span>
                   </div>
                   <b>
-                    {row?.fullName || "Chưa có dữ liệu"}
-                    {isMe && " (Bạn)"}
+                    {isMe ? "Bạn" : (row?.fullName || "Chưa có dữ liệu")}
                   </b>
                   <time>{formatTime(row?.bestDuration)}</time>
                 </article>
@@ -726,8 +725,7 @@ function Result({
                     <span className="rank-idx">{i + 4}</span>
                     <div className="rank-info">
                       <strong>
-                        {row.fullName}
-                        {isMe && "(Bạn)"}
+                        {isMe ? "Bạn" : row.fullName}
                       </strong>
                       {row.phone && (
                         <small>
@@ -832,8 +830,7 @@ function Leaderboard({ result }: { result?: any }) {
                   <span className="prize-orb-text">{podiumLabels[i]}</span>
                 </div>
                 <b>
-                  {row?.fullName || "Đang chờ"}
-                  {isMe && " (Bạn)"}
+                  {isMe ? "Bạn" : (row?.fullName || "Đang chờ")}
                 </b>
                 <time>{formatTime(row?.bestDuration)}</time>
               </article>
@@ -852,8 +849,7 @@ function Leaderboard({ result }: { result?: any }) {
                 <p key={r.phone || i}>
                   <span>{String(i + 4).padStart(2, "0")}</span>
                   <strong>
-                    {r.fullName}
-                    {isMe && " (Bạn)"}
+                    {isMe ? "Bạn" : r.fullName}
                   </strong>
                   <b style={{ color: isMe ? "#ef1c30" : undefined }}>{formatTime(r.bestDuration)}</b>
                 </p>
