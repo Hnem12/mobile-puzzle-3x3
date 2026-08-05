@@ -667,7 +667,6 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 .rank-list.compact::-webkit-scrollbar { width: 4px; }
 .rank-list.compact::-webkit-scrollbar-track { background: rgba(0,0,0,.2); border-radius: 4px; }
 .rank-list.compact::-webkit-scrollbar-thumb { background: #5a1e27; border-radius: 4px; }
-.rank-list.compact .rank-item:last-child { background: rgba(255,38,58,.28); border-radius: 7px; }
 .rank-item { display: flex; align-items: center; gap: 16px; padding: 12px; color: white; }
 .rank-idx { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; line-height: 1; letter-spacing: 0; color: white !important; width: 24px; text-align: center; }
 .rank-info { display: flex; flex-direction: column; flex: 1; gap: 4px; text-align: left; }

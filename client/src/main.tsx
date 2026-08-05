@@ -655,6 +655,8 @@ function Result({
     : -1;
   const currentRank =
     result.rank ?? (currentIndex >= 0 ? currentIndex + 1 : null);
+  const isPlayerInTop = currentRank !== null && currentRank <= 5;
+  const shouldShowBottomRank = result && currentRank !== null && !isPlayerInTop;
   const rest = rankedRows.slice(3, 5);
   return (
     <main
@@ -777,20 +779,29 @@ function Result({
                 );
               })
             ) : (
-              <div className="rank-item">
-                <span className="rank-idx">
-                  {currentIndex >= 0 ? currentIndex + 1 : "--"}
+              <div className="rank-item" style={{ opacity: 0.5 }}>
+                <span className="rank-idx">04</span>
+                <div className="rank-info">
+                  <strong>Chưa có thêm người chơi</strong>
+                </div>
+                <b className="rank-time">--</b>
+              </div>
+            )}
+            
+            {shouldShowBottomRank && (
+              <div className="rank-item" style={{ background: "rgba(239, 28, 48, 0.15)", border: "1px solid rgba(239, 28, 48, 0.3)", borderRadius: 8, marginTop: 8 }}>
+                <span className="rank-idx" style={{ background: "#ef1c30", color: "white", width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {currentRank}
                 </span>
                 <div className="rank-info">
-                  <strong>{result.user?.fullName || "Bạn"}</strong>
+                  <strong style={{ color: "white", fontSize: "14px", fontWeight: 800 }}>{result.user?.fullName || "Bạn"} (Bạn)</strong>
                   {result.user?.phone && (
                     <small>
-                      {result.user.phone.slice(0, 3)}***
-                      {result.user.phone.slice(-3)}
+                      {result.user.phone.slice(0, 3)}***{result.user.phone.slice(-3)}
                     </small>
                   )}
                 </div>
-                <b className="rank-time">{formatTime(result.duration)}</b>
+                <b className="rank-time" style={{ color: "#ef1c30" }}>{formatTime(result.duration)}</b>
               </div>
             )}
           </div>
