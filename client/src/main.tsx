@@ -489,7 +489,7 @@ function Puzzle({
             <span className="muted-label">
               <User size={14} /> Người chơi
             </span>
-            <h2 className="player-name">{user.fullName}</h2>
+            <h2 className="player-name">{truncateName(user.fullName)}</h2>
           </div>
           <div className="instruction-wrap">
             <strong className="correct-count">
@@ -714,7 +714,7 @@ function Result({
                   <div className="prize-orb">
                     <span className="prize-orb-text">{podiumLabels[i]}</span>
                   </div>
-                  <b>{isMe ? "Bạn" : row?.fullName || "Chưa có dữ liệu"}</b>
+                  <b>{isMe ? "Bạn" : truncateName(row?.fullName || "Chưa có dữ liệu")}</b>
                   <time>{formatTime(row?.bestDuration)}</time>
                 </article>
               );
@@ -762,7 +762,7 @@ function Result({
                       {i + 4}
                     </span>
                     <div className="rank-info">
-                      <strong style={isMe ? { color: "white", fontSize: "14px", fontWeight: 800 } : {}}>{isMe ? "Bạn" : row.fullName}</strong>
+                      <strong style={isMe ? { color: "white", fontSize: "14px", fontWeight: 800 } : {}}>{isMe ? "Bạn" : truncateName(row.fullName)}</strong>
                       {row.phone && (
                         <small>
                           {row.phone.slice(0, 3)}***{row.phone.slice(-3)}
@@ -794,7 +794,7 @@ function Result({
                   {currentRank}
                 </span>
                 <div className="rank-info">
-                  <strong style={{ color: "white", fontSize: "14px", fontWeight: 800 }}>{result.user?.fullName || "Bạn"} (Bạn)</strong>
+                  <strong style={{ color: "white", fontSize: "14px", fontWeight: 800 }}>{truncateName(result.user?.fullName || "Bạn")} (Bạn)</strong>
                   {result.user?.phone && (
                     <small>
                       {result.user.phone.slice(0, 3)}***{result.user.phone.slice(-3)}
@@ -880,7 +880,7 @@ function Leaderboard({ result }: { result?: any }) {
                 <div className="prize-orb">
                   <span className="prize-orb-text">{podiumLabels[i]}</span>
                 </div>
-                <b>{isMe ? "Bạn" : row?.fullName || "Đang chờ"}</b>
+                <b>{isMe ? "Bạn" : truncateName(row?.fullName || "Đang chờ")}</b>
                 <time>{formatTime(row?.bestDuration)}</time>
               </article>
             );
@@ -927,7 +927,7 @@ function Leaderboard({ result }: { result?: any }) {
                   >
                     {String(i + 4).padStart(2, "0")}
                   </span>
-                  <strong style={isMe ? { color: "white", fontSize: "14px", fontWeight: 800 } : {}}>{isMe ? "Bạn" : r.fullName}</strong>
+                  <strong style={isMe ? { color: "white", fontSize: "14px", fontWeight: 800 } : {}}>{isMe ? "Bạn" : truncateName(r.fullName)}</strong>
                   <b style={{ color: isMe ? "#ef1c30" : undefined }}>
                     {formatTime(r.bestDuration)}
                   </b>
@@ -1104,7 +1104,7 @@ function LedScreen() {
                 TOP {i === 0 ? 2 : i === 1 ? 1 : 3}
               </strong>
               <strong className="led-name">
-                {row?.fullName || "Đang chờ"}
+                {truncateName(row?.fullName || "Đang chờ")}
               </strong>
               <time className="led-time">{formatTime(row?.bestDuration)}</time>
             </div>
@@ -1120,7 +1120,7 @@ function LedScreen() {
                   <div className="led-rank-index">
                     {String(i + 4).padStart(2, "0")}
                   </div>
-                  <div className="led-rank-name">{r.fullName}</div>
+                  <div className="led-rank-name">{truncateName(r.fullName)}</div>
                   <div className="led-rank-time">
                     {formatTime(r.bestDuration)}
                   </div>
@@ -1183,6 +1183,11 @@ function formatTime(value: unknown) {
 function maskPhone(value: unknown) {
   const phone = String(value || "");
   return phone.length >= 6 ? `${phone.slice(0, 3)}***${phone.slice(-3)}` : "";
+}
+
+function truncateName(name: unknown, maxLen = 15) {
+  const str = String(name || "");
+  return str.length > maxLen ? str.substring(0, maxLen) + "..." : str;
 }
 
 function BrandHeader() {
