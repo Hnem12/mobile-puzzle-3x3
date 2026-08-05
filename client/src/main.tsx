@@ -714,9 +714,6 @@ function Leaderboard({
   return (
     <main className="game-hero leaderboard-screen">
       <section className="leaderboard-panel">
-        <button className="icon-back" onClick={onBack} aria-label="Quay lại">
-          <ChevronLeft size={18} />
-        </button>
         <BrandHeader />
         <div className="leaderboard-header-title">
           <h1>
@@ -741,7 +738,7 @@ function Leaderboard({
           ))}
         </div>
         
-        <div className="rank-list compact">
+        <div className="rank-list compact mobile-rank-list">
           {rest.length ? (
             rest.map((r, i) => (
               <p key={r.phone || i}>
@@ -757,67 +754,6 @@ function Leaderboard({
               <b>--</b>
             </p>
           )}
-        </div>
-        <div className="reward-grid">
-          <article className="rules-box game-card stack">
-            <h2>THỂ LỆ QUÀ TẶNG</h2>
-            <p>
-              Người chơi phá kỷ lục Top 3 tại thời điểm tham gia sẽ nhận ngay
-              quà tặng độc quyền từ thương hiệu.
-              <br />
-              Kết thúc chương trình, Top 3 chung cuộc trên bảng xếp hạng sẽ
-              nhận:
-            </p>
-            <ul className="prize-list">
-              <li>
-                <span className="rank-1">#1:</span> 01 xe máy điện MOVE Athena
-              </li>
-              <li>
-                <span className="rank-2">#2:</span> 01 máy massage cầm tay
-                Kingsport
-              </li>
-              <li>
-                <span className="rank-3">#3:</span> 01 máy massage cầm tay
-                Kingsport
-              </li>
-            </ul>
-          </article>
-          <aside
-            className="qr-box game-card stack"
-            style={{ alignItems: "center" }}
-          >
-            <div
-              style={{
-                background: "#fff",
-                padding: "8px",
-                borderRadius: "8px",
-                display: "inline-block",
-              }}
-            >
-              <QRCode
-                value="https://mobile-puzzle-3x3.pages.dev/?play=1"
-                size={120}
-              />
-            </div>
-            <b style={{ textAlign: "center" }}>
-              Quét QR tham gia đường
-              <br />
-              đua ngay
-            </b>
-            {window.location.hostname === "localhost" && (
-              <small
-                style={{
-                  color: "red",
-                  textAlign: "center",
-                  fontSize: "12px",
-                  marginTop: "4px",
-                }}
-              >
-                Vui lòng mở web bằng IP LAN (vd: 192.168.x.x) để ĐT có thể quét
-                được!
-              </small>
-            )}
-          </aside>
         </div>
       </section>
     </main>
