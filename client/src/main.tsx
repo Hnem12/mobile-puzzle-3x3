@@ -1187,7 +1187,11 @@ function maskPhone(value: unknown) {
 
 function truncateName(name: unknown, maxLen = 15) {
   const str = String(name || "");
-  return str.length > maxLen ? str.substring(0, maxLen) + "..." : str;
+  if (str.length <= maxLen) return str;
+  const charsToShow = maxLen - 3;
+  const frontChars = Math.ceil(charsToShow / 2);
+  const backChars = Math.floor(charsToShow / 2);
+  return str.substring(0, frontChars) + "..." + str.substring(str.length - backChars);
 }
 
 function BrandHeader() {
