@@ -432,7 +432,14 @@ function Puzzle({
       if (!res.ok) {
         throw new Error(data.message || "Cannot save history");
       }
-      onDone({ result, score, duration, moves, user, rank: data.rank ?? data.history?.rank });
+      onDone({
+        result,
+        score,
+        duration,
+        moves,
+        user,
+        rank: data.rank ?? data.history?.rank,
+      });
     } catch (e: any) {
       alert(
         e.message ||
@@ -705,9 +712,7 @@ function Result({
                   <div className="prize-orb">
                     <span className="prize-orb-text">{podiumLabels[i]}</span>
                   </div>
-                  <b>
-                    {isMe ? "Bạn" : (row?.fullName || "Chưa có dữ liệu")}
-                  </b>
+                  <b>{isMe ? "Bạn" : row?.fullName || "Chưa có dữ liệu"}</b>
                   <time>{formatTime(row?.bestDuration)}</time>
                 </article>
               );
@@ -721,19 +726,47 @@ function Result({
                   result?.user?.phone &&
                   row.phone === result.user.phone;
                 return (
-                  <div className="rank-item" key={row.phone || i}>
-                    <span className="rank-idx">{i + 4}</span>
+                  <div
+                    className="rank-item"
+                    key={row.phone || i}
+                    style={
+                      isMe
+                        ? {
+                            background: "rgba(239, 28, 48, 0.15)",
+                            border: "1px solid rgba(239, 28, 48, 0.3)",
+                            borderRadius: 8,
+                          }
+                        : {}
+                    }
+                  >
+                    <span
+                      className="rank-idx"
+                      style={
+                        isMe
+                          ? {
+                              background: "#ef1c30",
+                              color: "white",
+                              borderColor: "#ef1c30",
+                            }
+                          : {}
+                      }
+                    >
+                      {i + 4}
+                    </span>
                     <div className="rank-info">
-                      <strong>
-                        {isMe ? "Bạn" : row.fullName}
-                      </strong>
+                      <strong>{isMe ? "Bạn" : row.fullName}</strong>
                       {row.phone && (
                         <small>
                           {row.phone.slice(0, 3)}***{row.phone.slice(-3)}
                         </small>
                       )}
                     </div>
-                    <b className="rank-time" style={{ color: isMe ? "#ef1c30" : undefined }}>{formatTime(row.bestDuration)}</b>
+                    <b
+                      className="rank-time"
+                      style={{ color: isMe ? "#ef1c30" : undefined }}
+                    >
+                      {formatTime(row.bestDuration)}
+                    </b>
                   </div>
                 );
               })
@@ -795,7 +828,8 @@ function Leaderboard({ result }: { result?: any }) {
   const currentIndex = result?.user?.phone
     ? rows.findIndex((row) => row.phone === result.user.phone)
     : -1;
-  const currentRank = result?.rank ?? (currentIndex >= 0 ? currentIndex + 1 : null);
+  const currentRank =
+    result?.rank ?? (currentIndex >= 0 ? currentIndex + 1 : null);
 
   const isPlayerInTop = currentRank !== null && currentRank <= 10;
   const shouldShowBottomRank = result && currentRank !== null && !isPlayerInTop;
@@ -829,9 +863,7 @@ function Leaderboard({ result }: { result?: any }) {
                 <div className="prize-orb">
                   <span className="prize-orb-text">{podiumLabels[i]}</span>
                 </div>
-                <b>
-                  {isMe ? "Bạn" : (row?.fullName || "Đang chờ")}
-                </b>
+                <b>{isMe ? "Bạn" : row?.fullName || "Đang chờ"}</b>
                 <time>{formatTime(row?.bestDuration)}</time>
               </article>
             );
@@ -846,12 +878,35 @@ function Leaderboard({ result }: { result?: any }) {
                 result?.user?.phone &&
                 r.phone === result.user.phone;
               return (
-                <p key={r.phone || i}>
-                  <span>{String(i + 4).padStart(2, "0")}</span>
-                  <strong>
-                    {isMe ? "Bạn" : r.fullName}
-                  </strong>
-                  <b style={{ color: isMe ? "#ef1c30" : undefined }}>{formatTime(r.bestDuration)}</b>
+                <p
+                  key={r.phone || i}
+                  style={
+                    isMe
+                      ? {
+                          background: "rgba(239, 28, 48, 0.15)",
+                          border: "1px solid rgba(239, 28, 48, 0.3)",
+                          borderRadius: 8,
+                        }
+                      : {}
+                  }
+                >
+                  <span
+                    style={
+                      isMe
+                        ? {
+                            background: "#ef1c30",
+                            color: "white",
+                            borderColor: "#ef1c30",
+                          }
+                        : {}
+                    }
+                  >
+                    {String(i + 4).padStart(2, "0")}
+                  </span>
+                  <strong>{isMe ? "Bạn" : r.fullName}</strong>
+                  <b style={{ color: isMe ? "#ef1c30" : undefined }}>
+                    {formatTime(r.bestDuration)}
+                  </b>
                 </p>
               );
             })
