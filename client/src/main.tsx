@@ -16,6 +16,7 @@ import {
   Store,
   Scan,
   Crown,
+  ChevronUp,
 } from "lucide-react";
 import racingBg from "./assets/form-bg.png";
 import logoMove from "./assets/logo-move.png";
@@ -324,7 +325,7 @@ function Register({
               className={customerType === "retail" ? "active" : ""}
               onClick={() => setCustomerType("retail")}
             >
-              <User size={16} />{" "}
+              <User size={15} />{" "}
               <span style={{ fontSize: "11px" }}>Khách hàng mua lẻ</span>
             </button>
             <button
@@ -332,7 +333,7 @@ function Register({
               className={customerType === "agency" ? "active" : ""}
               onClick={() => setCustomerType("agency")}
             >
-              <Store size={16} />{" "}
+              <Store size={15} />{" "}
               <span style={{ fontSize: "11px" }}>Khách hàng đại lý</span>
             </button>
           </div>
@@ -391,7 +392,7 @@ function Puzzle({
   onDone: (r: any) => void;
   onLogout: () => void;
 }) {
-  const solved = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+  const solved = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   const [tiles, setTiles] = useState<number[]>(() => shuffleSolvable(solved));
   const [moves, setMoves] = useState(0);
   const [left, setLeft] = useState(level.timeLimit);
@@ -442,18 +443,29 @@ function Puzzle({
   }
   function move(i: number) {
     const blank = tiles.indexOf(0);
-    if (
-      ![i - 1, i + 1, i - 3, i + 3].includes(blank) ||
-      Math.abs((i % 3) - (blank % 3)) > 1
-    )
-      return;
+
+    let valid = false;
+    if (i === 0 && blank === 1) valid = true;
+    else if (i === 1 && blank === 0) valid = true;
+    else if (i >= 1 && blank >= 1) {
+      const gridI = i - 1;
+      const gridB = blank - 1;
+      const xI = gridI % 3,
+        yI = Math.floor(gridI / 3);
+      const xB = gridB % 3,
+        yB = Math.floor(gridB / 3);
+      if (Math.abs(xI - xB) + Math.abs(yI - yB) === 1) valid = true;
+    }
+
+    if (!valid) return;
+
     const next = [...tiles];
     [next[i], next[blank]] = [next[blank], next[i]];
     setTiles(next);
     setMoves((m) => m + 1);
   }
   const correctCount = tiles.reduce(
-    (acc, tile, idx) => acc + (tile === solved[idx] ? 1 : 0),
+    (acc, tile, idx) => acc + (tile !== 0 && tile === solved[idx] ? 1 : 0),
     0,
   );
 
@@ -493,28 +505,84 @@ function Puzzle({
         </div>
       </div>
 
-      <div className="play-screen-timer">
-        <strong>Thời gian</strong>
-        <span>{left.toFixed(2)}s</span>
-      </div>
-      <div className="progress">
-        <i style={{ width: `${(left / level.timeLimit) * 100}%` }} />
-      </div>
-      <div className="play-meta">
-        <span>Điểm: {calcScore(level, level.timeLimit - left, moves)}</span>
-        <span>{moves} bước</span>
-      </div>
-
-      <section className="board">
-        {tiles.map((tile, i) => (
+      <div className="game-board-container">
+        <div className="game-board-header">
           <button
-            key={i}
-            className={tile ? "tile" : "blank"}
-            onClick={() => move(i)}
-            style={tile ? tileStyle(tile, image?.imageUrl) : {}}
-          />
-        ))}
-      </section>
+            className={`moves-box ${!tiles[0] ? "blank" : ""}`}
+            onClick={() => move(0)}
+            style={{
+              cursor: "pointer",
+              padding: 0,
+              border: !tiles[0] ? "1px dashed rgba(239,28,48,.8)" : "none",
+              background: !tiles[0] ? "rgba(0,0,0,.38)" : "#ef1c30",
+              boxShadow: !tiles[0] ? "none" : undefined,
+              ...(tiles[0] ? tileStyle(tiles[0], image?.imageUrl) : {}),
+            }}
+          >
+            {!image && tiles[0] ? (
+              <span
+                style={{
+                  position: "relative",
+                  zIndex: 1,
+                  textShadow:
+                    "0 2px 8px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.8)",
+                }}
+              >
+                {tiles[0]}
+              </span>
+            ) : null}
+            {!tiles[0] && (
+              <div
+                style={{ position: "relative", width: "100%", height: "100%" }}
+              >
+                <ChevronUp
+                  size={24}
+                  className="blank-arrow-up"
+                  style={{ top: 4 }}
+                />
+                <ChevronLeft
+                  size={24}
+                  className="blank-arrow-left"
+                  style={{ left: 4 }}
+                />
+              </div>
+            )}
+          </button>
+          <div className="time-box">{left.toFixed(2)}s</div>
+        </div>
+
+        <section className="board">
+          {tiles.slice(1).map((tile, i) => {
+            const actualIndex = i + 1;
+            return (
+              <button
+                key={actualIndex}
+                className={tile ? "tile" : "blank"}
+                onClick={() => move(actualIndex)}
+                style={tile ? tileStyle(tile, image?.imageUrl) : {}}
+              >
+                {!image && tile ? (
+                  <span
+                    style={{
+                      fontSize: "24px",
+                      fontWeight: 900,
+                      color: "white",
+                    }}
+                  >
+                    {tile}
+                  </span>
+                ) : null}
+                {!tile && (
+                  <>
+                    <ChevronUp size={24} className="blank-arrow-up" />
+                    <ChevronLeft size={24} className="blank-arrow-left" />
+                  </>
+                )}
+              </button>
+            );
+          })}
+        </section>
+      </div>
       <button
         className="primary-red"
         disabled={!done}
@@ -586,25 +654,6 @@ function Result({
       style={{ "--result-bg": `url(${resultBg})` } as React.CSSProperties}
     >
       <section className="phone-panel result">
-        <button
-          type="button"
-          onClick={onLogout}
-          style={{
-            position: "absolute",
-            top: 20,
-            right: 20,
-            background: "rgba(255,255,255,0.2)",
-            color: "#fff",
-            border: "none",
-            padding: "6px 12px",
-            borderRadius: 20,
-            fontSize: 12,
-            cursor: "pointer",
-            zIndex: 10,
-          }}
-        >
-          Đổi người chơi
-        </button>
         <div className="confetti" aria-hidden="true">
           <i />
           <i />
@@ -1625,12 +1674,40 @@ function shuffleSolvable(solved: number[]): number[] {
   const arr = [...solved];
   for (let n = 0; n < 80; n++) {
     const blank = arr.indexOf(0);
-    const moves = [blank - 1, blank + 1, blank - 3, blank + 3].filter(
-      (i) => i >= 0 && i < 9 && Math.abs((i % 3) - (blank % 3)) <= 1,
-    );
+    const moves = [];
+    if (blank === 0) moves.push(1);
+    else if (blank === 1) moves.push(0);
+
+    if (blank >= 1) {
+      const gridIndex = blank - 1;
+      const x = gridIndex % 3;
+      const y = Math.floor(gridIndex / 3);
+      if (x > 0) moves.push(blank - 1);
+      if (x < 2) moves.push(blank + 1);
+      if (y > 0) moves.push(blank - 3);
+      if (y < 2) moves.push(blank + 3);
+    }
+
     const pick = moves[Math.floor(Math.random() * moves.length)];
     [arr[blank], arr[pick]] = [arr[pick], arr[blank]];
   }
+
+  let blank = arr.indexOf(0);
+  while (blank !== 9) {
+    let nextBlank = blank;
+    if (blank === 0) {
+      nextBlank = 1;
+    } else {
+      const gridIndex = blank - 1;
+      const x = gridIndex % 3;
+      const y = Math.floor(gridIndex / 3);
+      if (x < 2) nextBlank = blank + 1;
+      else if (y < 2) nextBlank = blank + 3;
+    }
+    [arr[blank], arr[nextBlank]] = [arr[nextBlank], arr[blank]];
+    blank = nextBlank;
+  }
+
   return arr.join() === solved.join() ? shuffleSolvable(solved) : arr;
 }
 function tileStyle(tile: number, url?: string): React.CSSProperties {
