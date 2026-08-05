@@ -735,7 +735,7 @@ function Result({
                         </small>
                       )}
                     </div>
-                    <b className="rank-time">{formatTime(row.bestDuration)}</b>
+                    <b className="rank-time" style={{ color: isMe ? "#ef1c30" : undefined }}>{formatTime(row.bestDuration)}</b>
                   </div>
                 );
               })
@@ -794,7 +794,7 @@ function Leaderboard({ result }: { result?: any }) {
   const podiumLabels = ["TOP 2", "TOP 1", "TOP 3"];
   const rest = rows.slice(3);
 
-  const isPlayerInTop = result && result.rank && result.rank <= 5;
+  const isPlayerInTop = result && result.rank && result.rank <= 10;
   const shouldShowBottomRank = result && result.rank && !isPlayerInTop;
 
   return (
@@ -850,7 +850,7 @@ function Leaderboard({ result }: { result?: any }) {
                     {r.fullName}
                     {isMe && " (Bạn)"}
                   </strong>
-                  <b>{formatTime(r.bestDuration)}</b>
+                  <b style={{ color: isMe ? "#ef1c30" : undefined }}>{formatTime(r.bestDuration)}</b>
                 </p>
               );
             })
