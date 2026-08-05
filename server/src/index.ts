@@ -381,7 +381,28 @@ app.post("/api/game/histories", async (req, res) => {
   }
 
   const history = await GameHistory.create(parsed.data);
-  res.status(201).json(history);
+  let rank = null;
+  if (parsed.data.result === "WIN") {
+    // Calculate rank uniquely by user to match leaderboard logic
+    const leaderboard = await GameHistory.aggregate([
+      { $match: { result: "WIN" } },
+      { $sort: { duration: 1, score: -1, moves: 1 } },
+      {
+        $group: {
+          _id: "$userId",
+          bestDuration: { $first: "$duration" },
+          score: { $first: "$score" },
+          moves: { $first: "$moves" },
+        },
+      },
+      { $sort: { bestDuration: 1, score: -1, moves: 1 } },
+    ]);
+    const idx = leaderboard.findIndex(
+      (w) => String(w._id) === String(parsed.data.userId),
+    );
+    if (idx >= 0) rank = idx + 1;
+  }
+  res.status(201).json({ ...history.toObject(), rank });
 
   // Trigger configured ZBS API
   (async () => {

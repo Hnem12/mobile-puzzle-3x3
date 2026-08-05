@@ -206,25 +206,7 @@ function Game() {
     }
   };
 
-  if (leaderboard)
-    return (
-      <Leaderboard
-        levels={[activeLevel]}
-        onBack={() => {
-          setLeaderboard(false);
-          if (!result) {
-            // Tạm thời mock result để nút back dẫn về màn Result
-            setResult({
-              result: "WIN",
-              score: 1000,
-              duration: 12.34,
-              moves: 20,
-              user: { fullName: "Test User", phone: "0900000000" },
-            });
-          }
-        }}
-      />
-    );
+  if (leaderboard) return <Leaderboard result={result} />;
   if (result)
     return (
       <Result
@@ -664,7 +646,8 @@ function Result({
   const currentIndex = result.user?.phone
     ? rankedRows.findIndex((row) => row.phone === result.user.phone)
     : -1;
-  const currentRank = currentIndex >= 0 ? currentIndex + 1 : null;
+  const currentRank =
+    result.rank ?? (currentIndex >= 0 ? currentIndex + 1 : null);
   const rest = rankedRows.slice(3, 5);
   return (
     <main
@@ -757,7 +740,7 @@ function Result({
             )}
           </div>
         </div>
-        <button className="primary-red notify" onClick={onLeaderboard}>
+        <button className="primary-red notify" onClick={() => onLeaderboard()}>
           <Bell size={16} color="white" /> THEO DÕI BẢNG XẾP HẠNG QUA ZALO NGAY
         </button>
       </section>
@@ -765,13 +748,7 @@ function Result({
   );
 }
 
-function Leaderboard({
-  levels,
-  onBack,
-}: {
-  levels: Level[];
-  onBack: () => void;
-}) {
+function Leaderboard({ result }: { result?: any }) {
   const [rows, setRows] = useState<any[]>([]);
 
   useEffect(() => {
@@ -798,6 +775,9 @@ function Leaderboard({
   const podium = [rows[1], rows[0], rows[2]];
   const podiumLabels = ["TOP 2", "TOP 1", "TOP 3"];
   const rest = rows.slice(3);
+
+  const isPlayerInTop = result && result.rank && result.rank <= 10;
+  const shouldShowBottomRank = result && result.rank && !isPlayerInTop;
 
   return (
     <main className="game-hero leaderboard-screen">
@@ -840,6 +820,42 @@ function Leaderboard({
               <span>04</span>
               <strong>Chưa có thêm người chơi</strong>
               <b>--</b>
+            </p>
+          )}
+
+          {shouldShowBottomRank && (
+            <p
+              style={{
+                marginTop: 12,
+                background: "rgba(239, 28, 48, 0.15)",
+                borderRadius: 8,
+                border: "1px solid rgba(239, 28, 48, 0.3)",
+              }}
+            >
+              <span
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: "50%",
+                  background: "#ef1c30",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                  flexShrink: 0,
+                }}
+              >
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: "white",
+                  }}
+                />
+              </span>
+              <strong style={{ flex: 1 }}>Bạn (hạng {result.rank})</strong>
+              <b style={{ color: "#ef1c30" }}>{formatTime(result.duration)}</b>
             </p>
           )}
         </div>
