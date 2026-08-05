@@ -197,6 +197,11 @@ input, select {
   box-shadow: 0 7px 18px rgba(239,28,48,.35);
   min-height: 42px;
   text-transform: uppercase;
+  font-family: Inter, sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 0.04em;
 }
 .ghost-red {
   background: rgba(239, 28, 48, .08);
@@ -241,15 +246,15 @@ input, select {
 .play-meta { color: #ffb2bb; display: flex; font-size: 12px; font-weight: 800; justify-content: space-between; }
 
 .puzzle-header-info { display: flex; justify-content: space-between; gap: 16px; margin: 12px 0 24px; align-items: stretch; }
-.player-info-col { display: flex; flex-direction: column; justify-content: space-between; gap: 8px; flex: 1; }
-.player-name-wrap { display: flex; flex-direction: column; gap: 4px; }
-.player-name { font-size: 16px; font-weight: 700; color: white; margin: 0; line-height: 1; letter-spacing: 0; }
-.instruction-wrap { display: flex; flex-direction: column; gap: 6px; }
-.correct-count { color: #ef1c30; font-size: 16px; font-weight: 700; line-height: 1; letter-spacing: 0; }
-.instruction-text { color: rgba(255,255,255,.85); font-size: 10px; font-weight: 400; margin: 0; line-height: 1; letter-spacing: 0; max-width: 220px; }
-.sample-image-col { display: flex; align-items: flex-end; }
+.player-info-col { display: flex; flex-direction: column; justify-content: center; gap: 32px; flex: 1; }
+.player-name-wrap { display: flex; flex-direction: column; gap: 6px; }
+.player-name { font-size: 22px; font-weight: 700; color: white; margin: 0; line-height: 1; letter-spacing: 0; }
+.instruction-wrap { display: flex; flex-direction: column; gap: 8px; }
+.correct-count { color: #ef1c30; font-size: 18px; font-weight: 700; line-height: 1; letter-spacing: 0; }
+.instruction-text { color: rgba(255,255,255,.95); font-size: 13px; font-weight: 400; margin: 0; line-height: 1.4; letter-spacing: 0; max-width: 220px; }
+.sample-image-col { display: flex; align-items: center; }
 .sample-card { background: rgba(58, 20, 26, 0.9); border: 1px solid #ef1c30; border-radius: 12px; display: flex; flex-direction: column; width: 140px; flex-shrink: 0; padding: 12px; }
-.sample-card-header { background: transparent; color: #ef1c30; font-size: 4.68px; font-weight: 700; line-height: 1; letter-spacing: 0.02em; text-align: center; padding: 0 0 10px 0; text-transform: uppercase; }
+.sample-card-header { background: transparent; color: #ef1c30; font-size: 8px; font-weight: 700; line-height: 1; letter-spacing: 0.02em; text-align: center; padding: 0 0 10px 0; text-transform: uppercase; }
 .sample-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
 .sample-placeholder { width: 100%; aspect-ratio: 1; background: #2a0d15; border-radius: 8px; }
 .play-screen-timer { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }

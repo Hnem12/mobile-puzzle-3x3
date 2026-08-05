@@ -61,7 +61,10 @@ const auth = () => ({
   Authorization: `Bearer ${localStorage.getItem("adminToken") || ""}`,
 });
 function App() {
-  const isPlay = new URLSearchParams(window.location.search).has("play");
+  const isPlay =
+    new URLSearchParams(window.location.search).has("play") ||
+    location.pathname.startsWith("/play");
+
   if (
     location.pathname.startsWith("/led") ||
     (location.pathname === "/" && !isPlay)
@@ -82,7 +85,10 @@ function Game() {
   const [level, setLevel] = useState<Level | null>(null);
   const [result, setResult] = useState<any>(null);
   const [leaderboard, setLeaderboard] = useState(
-    !new URLSearchParams(window.location.search).has("play"),
+    !(
+      new URLSearchParams(window.location.search).has("play") ||
+      location.pathname.startsWith("/play")
+    ),
   );
   const [bootError, setBootError] = useState("");
   useEffect(() => {
@@ -501,7 +507,7 @@ function Puzzle({
               {correctCount}/9 vị trí đúng
             </strong>
             <p className="instruction-text">
-              Bấm vào ô kề ô trống để di chuyển thành hình hoàn thiện
+              Bấm vào các ô kề ô trống để di chuyển thành hình hoàn thiện
             </p>
           </div>
         </div>
@@ -600,7 +606,7 @@ function Puzzle({
         disabled={!done}
         onClick={() => finish("WIN")}
       >
-        Hoàn tất quà
+        NỘP KẾT QUẢ
       </button>
     </main>
   );
