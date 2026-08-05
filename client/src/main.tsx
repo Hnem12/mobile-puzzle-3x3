@@ -60,6 +60,10 @@ const auth = () => ({
   Authorization: `Bearer ${localStorage.getItem("adminToken") || ""}`,
 });
 function App() {
+  const isPlay = new URLSearchParams(window.location.search).has("play");
+  if (location.pathname.startsWith("/led") || (location.pathname === "/" && !isPlay)) {
+    return <LedScreen />;
+  }
   return (
     <div style={{ "--racing-bg": `url(${racingBg})` } as React.CSSProperties}>
       {location.pathname.startsWith("/admin") ? <Admin /> : <Game />}
@@ -637,12 +641,8 @@ function Result({
           {podium.map((row, i) => (
             <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
               <div className="prize-orb">
-                <img
-                  src={[imgTop2, imgTop1, imgTop3][i]}
-                  alt={podiumLabels[i]}
-                />
+                <span className="prize-orb-text">{podiumLabels[i]}</span>
               </div>
-              <strong className="rank-label">{podiumLabels[i]}</strong>
               <b>{row?.fullName || "Chưa có dữ liệu"}</b>
               <time>{formatTime(row?.bestDuration)}</time>
             </article>
@@ -733,17 +733,14 @@ function Leaderboard({
           {podium.map((row, i) => (
             <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
               <div className="prize-orb">
-                <img
-                  src={[imgTop2, imgTop1, imgTop3][i]}
-                  alt={podiumLabels[i]}
-                />
+                <span className="prize-orb-text">{podiumLabels[i]}</span>
               </div>
-              <strong className="rank-label">{podiumLabels[i]}</strong>
               <b>{row?.fullName || "Đang chờ"}</b>
               <time>{formatTime(row?.bestDuration)}</time>
             </article>
           ))}
         </div>
+        
         <div className="rank-list compact">
           {rest.length ? (
             rest.map((r, i) => (
@@ -823,6 +820,129 @@ function Leaderboard({
           </aside>
         </div>
       </section>
+    </main>
+  );
+}
+
+function LedScreen() {
+  const [rows, setRows] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch(`${API}/game/leaderboard`)
+      .then((r) => {
+        if (!r.ok) throw new Error("Cannot load leaderboard");
+        return r.json();
+      })
+      .then((data: any[]) => {
+        const sorted = [...data].sort((a, b) => {
+          const aDuration = a.bestDuration ?? Infinity;
+          const bDuration = b.bestDuration ?? Infinity;
+          if (aDuration !== bDuration) {
+            return aDuration - bDuration;
+          }
+          return (b.bestScore ?? 0) - (a.bestScore ?? 0);
+        });
+
+        setRows(sorted);
+      })
+      .catch(() => setRows([]));
+  }, []);
+
+  // Poll for updates on LED screen
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetch(`${API}/game/leaderboard`)
+        .then(r => r.ok ? r.json() : [])
+        .then((data: any[]) => {
+          const sorted = [...data].sort((a, b) => {
+            const aDuration = a.bestDuration ?? Infinity;
+            const bDuration = b.bestDuration ?? Infinity;
+            if (aDuration !== bDuration) {
+              return aDuration - bDuration;
+            }
+            return (b.bestScore ?? 0) - (a.bestScore ?? 0);
+          });
+          setRows(sorted);
+        })
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const podium = [rows[1], rows[0], rows[2]];
+  const podiumLabels = ["TOP 2", "TOP 1", "TOP 3"];
+  const rest = rows.slice(3);
+
+  return (
+    <main className="led-screen">
+      <div className="led-container">
+        {/* Header */}
+        <div className="led-header">
+          <div className="led-brand-box">
+            <img src={logoMove} alt="Move" className="led-logo" />
+            <X size={16} strokeWidth={3} color="#000" className="led-cross" />
+            <img src={logoKingsport} alt="Kingsport" className="led-logo" />
+          </div>
+          <h1 className="led-title-main">MOVE TO BE KING</h1>
+          <h2 className="led-title-sub">THE FASTER HAND</h2>
+        </div>
+
+        {/* Podium */}
+        <div className="led-podium-section">
+          {podium.map((row, i) => (
+            <div className={`led-top-card led-pos-${i + 1}`} key={podiumLabels[i]}>
+              <div className="led-orb">
+                <span className="led-orb-text">{['HC Bạc', 'HC Vàng', 'HC Đồng'][i]}</span>
+              </div>
+              <strong className="led-name">{row?.fullName || "Đang chờ"}</strong>
+              <time className="led-time">{formatTime(row?.bestDuration)}</time>
+            </div>
+          ))}
+        </div>
+
+        {/* List */}
+        <div className="led-list-wrapper">
+          <div className="led-rank-list-inner">
+            {rest.length ? (
+              rest.map((r, i) => (
+                <div className="led-rank-row" key={r.phone || i}>
+                  <div className="led-rank-index">{i + 4}</div>
+                  <div className="led-rank-info">
+                    <span className="led-rank-name">{r.fullName}</span>
+                    <span className="led-rank-phone">{maskPhone(r.phone)}</span>
+                  </div>
+                  <div className="led-rank-time">{formatTime(r.bestDuration)}</div>
+                </div>
+              ))
+            ) : (
+              <div className="led-rank-row">
+                <div className="led-rank-index">4</div>
+                <div className="led-rank-info">
+                  <span className="led-rank-name">Chưa có thêm người chơi</span>
+                  <span className="led-rank-phone">--</span>
+                </div>
+                <div className="led-rank-time">--</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="led-footer">
+          <div className="led-rules-box">
+            <p><b>[Cúp vàng]</b> Giải nhất: 01 Xe máy điện Athena</p>
+            <p><b>[Cúp bạc]</b> Giải nhì: Máy massage cầm tay Kingsport</p>
+            <p><b>[Cúp đồng]</b> Giải ba: Máy massage cầm tay Kingsport</p>
+            <p><b>[Huân chương]</b> Giải phá kỷ lục: Chờ tên quà bên King</p>
+          </div>
+          <div className="led-qr-section">
+            <div className="led-qr-bg">
+              <QRCode value="https://mobile-puzzle-3x3.pages.dev/?play=1" size={130} />
+            </div>
+            <span className="led-qr-text">Quét QR tham gia<br/>đường đua ngay</span>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
