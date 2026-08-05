@@ -428,11 +428,11 @@ function Puzzle({
           moves,
         }),
       });
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
         throw new Error(data.message || "Cannot save history");
       }
-      onDone({ result, score, duration, moves, user });
+      onDone({ result, score, duration, moves, user, rank: data.rank ?? data.history?.rank });
     } catch (e: any) {
       alert(
         e.message ||
@@ -794,8 +794,13 @@ function Leaderboard({ result }: { result?: any }) {
   const podiumLabels = ["TOP 2", "TOP 1", "TOP 3"];
   const rest = rows.slice(3);
 
-  const isPlayerInTop = result && result.rank && result.rank <= 10;
-  const shouldShowBottomRank = result && result.rank && !isPlayerInTop;
+  const currentIndex = result?.user?.phone
+    ? rows.findIndex((row) => row.phone === result.user.phone)
+    : -1;
+  const currentRank = result?.rank ?? (currentIndex >= 0 ? currentIndex + 1 : null);
+
+  const isPlayerInTop = currentRank !== null && currentRank <= 10;
+  const shouldShowBottomRank = result && currentRank !== null && !isPlayerInTop;
 
   return (
     <main className="game-hero leaderboard-screen">
@@ -893,7 +898,7 @@ function Leaderboard({ result }: { result?: any }) {
                   }}
                 />
               </span>
-              <strong style={{ flex: 1 }}>Bạn (hạng {result.rank})</strong>
+              <strong style={{ flex: 1 }}>Bạn (hạng {currentRank})</strong>
               <b style={{ color: "#ef1c30" }}>{formatTime(result.duration)}</b>
             </p>
           )}
