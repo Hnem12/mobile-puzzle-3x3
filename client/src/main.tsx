@@ -204,7 +204,19 @@ function Game() {
     return (
       <Leaderboard
         levels={[activeLevel]}
-        onBack={() => setLeaderboard(false)}
+        onBack={() => {
+          setLeaderboard(false);
+          if (!result) {
+            // Tạm thời mock result để nút back dẫn về màn Result
+            setResult({
+              result: "WIN",
+              score: 1000,
+              duration: 12.34,
+              moves: 20,
+              user: { fullName: "Test User", phone: "0900000000" },
+            });
+          }
+        }}
       />
     );
   if (result)
@@ -680,60 +692,67 @@ function Result({
             width: "100%",
           }}
         >
-          Thật tuyệt vời <Crown color="#ffd72a" fill="#ffd72a" size={24} />
+          Thật tuyệt vời <Crown color="#ffd72a" fill="#ffd72a" size={20} />
         </b>
         <p className="result-copy">
-          {currentRank ? (
-            currentRank <= 3 ? (
-              <>
-                Bạn đang ở <b>Top {currentRank}</b>.
-              </>
-            ) : (
-              <>
-                Bạn đang ở <b>hạng {currentRank}</b>.
-              </>
-            )
-          ) : (
-            <>Kết quả của bạn đã được ghi nhận và BXH đang cập nhật.</>
-          )}{" "}
+          Bạn đã nằm trong <b style={{ color: "white" }}>Top {currentRank}</b>{" "}
+          của MOVE to be KING. Chúc mừng bạn đã nhận được phần quà độc quyền.
           Liên tục cập nhật BXH để theo dõi cơ hội nhận{" "}
           <b>01 chiếc xe máy điện Athena.</b>
         </p>
 
-        <div className="top-board">
-          {podium.map((row, i) => (
-            <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
-              <div className="prize-orb">
-                <span className="prize-orb-text">{podiumLabels[i]}</span>
+        <div className="leaderboard-card">
+          <div className="top-board">
+            {podium.map((row, i) => (
+              <article
+                className={`top-card top-${i + 1}`}
+                key={podiumLabels[i]}
+              >
+                <div className="prize-orb">
+                  <span className="prize-orb-text">{podiumLabels[i]}</span>
+                </div>
+                <b>{row?.fullName || "Chưa có dữ liệu"}</b>
+                <time>{formatTime(row?.bestDuration)}</time>
+              </article>
+            ))}
+          </div>
+          <div className="rank-list compact">
+            {rest.length ? (
+              rest.map((row, i) => (
+                <div className="rank-item" key={row.phone || i}>
+                  <span className="rank-idx">{i + 4}</span>
+                  <div className="rank-info">
+                    <strong>{row.fullName}</strong>
+                    {row.phone && (
+                      <small>
+                        {row.phone.slice(0, 3)}***{row.phone.slice(-3)}
+                      </small>
+                    )}
+                  </div>
+                  <b className="rank-time">{formatTime(row.bestDuration)}</b>
+                </div>
+              ))
+            ) : (
+              <div className="rank-item">
+                <span className="rank-idx">
+                  {currentIndex >= 0 ? currentIndex + 1 : "--"}
+                </span>
+                <div className="rank-info">
+                  <strong>{result.user?.fullName || "Bạn"}</strong>
+                  {result.user?.phone && (
+                    <small>
+                      {result.user.phone.slice(0, 3)}***
+                      {result.user.phone.slice(-3)}
+                    </small>
+                  )}
+                </div>
+                <b className="rank-time">{formatTime(result.duration)}</b>
               </div>
-              <b>{row?.fullName || "Chưa có dữ liệu"}</b>
-              <time>{formatTime(row?.bestDuration)}</time>
-            </article>
-          ))}
-        </div>
-        <div className="rank-list compact">
-          {rest.length ? (
-            rest.map((row, i) => (
-              <p key={row.phone || i}>
-                <span>{String(i + 4).padStart(2, "0")}</span>
-                <strong>{row.fullName}</strong>
-                <b>{formatTime(row.bestDuration)}</b>
-              </p>
-            ))
-          ) : (
-            <p>
-              <span>
-                {currentIndex >= 0
-                  ? String(currentIndex + 1).padStart(2, "0")
-                  : "--"}
-              </span>
-              <strong>{result.user?.fullName || "Bạn"}</strong>
-              <b>{formatTime(result.duration)}</b>
-            </p>
-          )}
+            )}
+          </div>
         </div>
         <button className="primary-red notify" onClick={onLeaderboard}>
-          <Bell size={16} /> THEO DÕI BẢNG XẾP HẠNG QUA ZALO NGAY
+          <Bell size={16} color="white" /> THEO DÕI BẢNG XẾP HẠNG QUA ZALO NGAY
         </button>
       </section>
     </main>
@@ -786,10 +805,10 @@ function Leaderboard({
             <span className="bolt">
               <Zap size={22} fill="currentColor" />
             </span>{" "}
-            Move to be king
+            MOVE TO BE KING
           </h1>
           <p className="subtitle" style={{ color: "red" }}>
-            The faster hand
+            THE FASTER HAND
           </p>
         </div>
         <div className="top-board">

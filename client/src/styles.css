@@ -588,7 +588,7 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 .muted-label { color: rgba(255,255,255,.62); font-size: 10px; font-weight: 400; letter-spacing: 0; line-height: 1; margin: 0; text-transform: uppercase; }
 .time-result { color: #ff2237; font-size: 50px; font-weight: 950; letter-spacing: 1px; line-height: .98; }
 .winner-copy { color: #ffd72a; font-size: 18px; margin-top: 8px; text-transform: uppercase; }
-.result-copy { color: rgba(255,255,255,.86); font-size: 13px; line-height: 1.35; margin: 0 2px 18px; max-width: 330px; }
+.result-copy { font-family: 'Inter', sans-serif; color: rgba(255,255,255,.86); font-size: 12px; font-weight: 400; line-height: 1.4; letter-spacing: 0; text-align: center; margin: 0 2px 18px; max-width: 330px; }
 .result-copy b { color: #ff263a; }
 .confetti { height: 120px; inset: 0 0 auto; pointer-events: none; position: absolute; z-index: 0; }
 .confetti i { border-radius: 999px; height: 8px; position: absolute; width: 8px; }
@@ -600,18 +600,25 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 .confetti i:nth-child(6) { background: #8ee7ff; right: 98px; top: 70px; }
 .confetti i:nth-child(7) { background: #ffd72a; right: 54px; top: 54px; }
 .confetti i:nth-child(8) { background: #ff263a; right: 146px; top: 96px; }
-.top-board {
+.leaderboard-card {
   background: linear-gradient(180deg, #3a151b 0%, #200d11 100%);
-  border: 2px solid #5a1e27;
+  border: 1px solid #5a1e27;
   border-radius: 16px;
   box-shadow: 0 16px 32px rgba(0, 0, 0, .4);
+  width: 100%;
+  padding: 24px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.top-board {
   display: grid;
   gap: 12px 6px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  padding: 24px 14px 16px;
   width: 100%;
   align-items: flex-end;
 }
+
 .result-board { margin-top: 2px; }
 .top-card { align-items: center; color: #fff; display: flex; flex-direction: column; gap: 8px; justify-items: center; min-width: 0; text-align: center; }
 .prize-orb {
@@ -619,13 +626,13 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
   height: 68px; justify-content: center; width: 68px;
   border: 3px solid; box-shadow: inset 0 2px 6px rgba(0,0,0,.15);
 }
+.top-card:nth-child(1), .top-card:nth-child(3) { margin-bottom: 10px; }
 .top-card:nth-child(1) .prize-orb { border-color: #ffffff; }
 .top-card:nth-child(2) .prize-orb { height: 86px; width: 86px; border-width: 4px; border-color: #e0ac2b; }
 .top-card:nth-child(3) .prize-orb { border-color: #ff7a59; }
 .prize-orb-text {
   font-size: 13px; font-weight: 800; color: #fff;
 }
-.top-card:nth-child(2) .prize-orb-text { font-size: 16px; }
 .top-card b { font-size: 13px; line-height: 1.15; white-space: nowrap; }
 .top-card time { color: #94a3b8; font-size: 12px; }
 .rank-list.mini { background: rgba(27, 9, 15, .64); border-color: rgba(255,255,255,.06); border-radius: 8px; grid-column: 1 / -1; padding: 6px 12px; }
@@ -633,8 +640,8 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 .rank-list.mini span { color: rgba(255,255,255,.75); }
 .rank-list.mini strong { display: grid; font-size: 12px; gap: 2px; }
 .rank-list.mini small { color: rgba(255,255,255,.48); font-size: 10px; font-weight: 500; }
-.notify { margin: 24px auto 0; max-width: 320px; width: 100%; min-height: 44px; font-size: 11px; border-radius: 8px; font-weight: 800; padding: 0 12px; justify-content: center; }
-.notify svg { width: 16px !important; height: 16px !important; color: #f7c948; flex-shrink: 0; }
+.notify { margin: 24px auto 0; max-width: 320px; width: 100%; min-height: 44px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; line-height: 1; letter-spacing: 0; border-radius: 8px; padding: 0 12px; justify-content: center; text-align: center; }
+.notify svg { width: 16px !important; height: 16px !important; color: white; flex-shrink: 0; }
 .replay { opacity: .76; }
 .leaderboard-panel {
   display: grid;
@@ -651,8 +658,17 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 .leaderboard-header-title h1 { font-size: 28px; font-weight: 950; line-height: 1; margin: 0; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
 .bolt { color: #ff2237; display: inline-flex; }
 .leaderboard-header-title .subtitle { font-size: 19px; margin: 0; text-align: center; color: #ff2237; font-weight: 900; }
-.rank-list.compact { background: linear-gradient(135deg, rgba(107, 30, 43, .98), rgba(67, 17, 27, .96)); border-radius: 8px; box-shadow: 0 18px 36px rgba(239,28,48,.18); padding: 12px; }
-.rank-list.compact p:last-child { background: rgba(255,38,58,.28); border-radius: 7px; }
+.rank-list.compact { background: rgba(30, 8, 12, 0.4); border-radius: 12px; padding: 8px; display: flex; flex-direction: column; max-height: 200px; overflow-y: auto; }
+.rank-list.compact::-webkit-scrollbar { width: 4px; }
+.rank-list.compact::-webkit-scrollbar-track { background: rgba(0,0,0,.2); border-radius: 4px; }
+.rank-list.compact::-webkit-scrollbar-thumb { background: #5a1e27; border-radius: 4px; }
+.rank-list.compact .rank-item:last-child { background: rgba(255,38,58,.28); border-radius: 7px; }
+.rank-item { display: flex; align-items: center; gap: 16px; padding: 12px; color: white; }
+.rank-idx { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; line-height: 1; letter-spacing: 0; color: white !important; width: 24px; text-align: center; }
+.rank-info { display: flex; flex-direction: column; flex: 1; gap: 4px; text-align: left; }
+.rank-info strong { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; line-height: 1; letter-spacing: 0; }
+.rank-info small { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 400; line-height: 1; color: rgba(255,255,255,.5); }
+.rank-time { font-family: 'Inter', sans-serif; color: #ff263a; font-size: 12px; font-weight: 700; line-height: 1; letter-spacing: 0; }
 .reward-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-top: 16px; align-items: stretch; }
 .leaderboard-header-title .subtitle { color: #fedb70; font-size: 16px; margin-top: 4px; text-transform: uppercase; font-weight: 800; }
 .level-tabs { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
