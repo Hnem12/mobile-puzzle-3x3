@@ -735,6 +735,7 @@ function Result({
                             background: "rgba(239, 28, 48, 0.15)",
                             border: "1px solid rgba(239, 28, 48, 0.3)",
                             borderRadius: 8,
+                            padding: "14px 16px",
                           }
                         : {}
                     }
@@ -746,7 +747,12 @@ function Result({
                           ? {
                               background: "#ef1c30",
                               color: "white",
-                              borderColor: "#ef1c30",
+                              width: 28,
+                              height: 28,
+                              borderRadius: "50%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
                             }
                           : {}
                       }
@@ -754,7 +760,7 @@ function Result({
                       {i + 4}
                     </span>
                     <div className="rank-info">
-                      <strong>{isMe ? "Bạn" : row.fullName}</strong>
+                      <strong style={isMe ? { color: "white", fontSize: "14px", fontWeight: 800 } : {}}>{isMe ? "Bạn" : row.fullName}</strong>
                       {row.phone && (
                         <small>
                           {row.phone.slice(0, 3)}***{row.phone.slice(-3)}
@@ -886,6 +892,8 @@ function Leaderboard({ result }: { result?: any }) {
                           background: "rgba(239, 28, 48, 0.15)",
                           border: "1px solid rgba(239, 28, 48, 0.3)",
                           borderRadius: 8,
+                          padding: "14px 16px",
+                          gridTemplateColumns: "28px 1fr auto",
                         }
                       : {}
                   }
@@ -896,14 +904,19 @@ function Leaderboard({ result }: { result?: any }) {
                         ? {
                             background: "#ef1c30",
                             color: "white",
-                            borderColor: "#ef1c30",
+                            width: 28,
+                            height: 28,
+                            borderRadius: "50%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
                           }
                         : {}
                     }
                   >
                     {String(i + 4).padStart(2, "0")}
                   </span>
-                  <strong>{isMe ? "Bạn" : r.fullName}</strong>
+                  <strong style={isMe ? { color: "white", fontSize: "14px", fontWeight: 800 } : {}}>{isMe ? "Bạn" : r.fullName}</strong>
                   <b style={{ color: isMe ? "#ef1c30" : undefined }}>
                     {formatTime(r.bestDuration)}
                   </b>
