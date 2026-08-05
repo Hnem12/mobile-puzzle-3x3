@@ -860,8 +860,7 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 60px;
-  margin-top: 0px;
+  margin-top: -30px;
 }
 
 .led-brand-box {
@@ -872,8 +871,14 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 }
 
 .led-logo {
-  height: 150px;
-  object-fit: contain;
+  width: 380px;
+  height: 120px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.led-zap {
+  margin-bottom: 40px;
 }
 
 .led-title-main {
@@ -899,7 +904,8 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
   justify-content: center;
   align-items: flex-end;
   gap: 50px;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
+  margin-top: 90px;
   background: rgba(0, 0, 0, 0.7);
   border: 2px solid #ef1c30;
   border-radius: 20px;
@@ -978,12 +984,12 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 
 .led-list-wrapper {
   flex: 1;
-  min-height: 350px;
+  min-height: 0;
   background: rgba(0, 0, 0, 0.7);
   border: 2px solid #ef1c30;
   border-radius: 12px;
   padding: 20px 4px 20px 20px;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   overflow: hidden;
   display: flex;
 }
@@ -1054,7 +1060,7 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 
 .led-footer {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 7fr 3fr;
   gap: 30px;
 }
 
@@ -1102,7 +1108,8 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  width: 380px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .led-qr-bg {
@@ -1119,10 +1126,11 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
 
 .led-qr-text {
   color: #ef1c30;
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 22px;
+  font-weight: 700;
   text-align: center;
   text-transform: uppercase;
+  font-family: inter;
 }
 
 .mobile-top-board {

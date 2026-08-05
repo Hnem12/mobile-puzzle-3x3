@@ -61,7 +61,10 @@ const auth = () => ({
 });
 function App() {
   const isPlay = new URLSearchParams(window.location.search).has("play");
-  if (location.pathname.startsWith("/led") || (location.pathname === "/" && !isPlay)) {
+  if (
+    location.pathname.startsWith("/led") ||
+    (location.pathname === "/" && !isPlay)
+  ) {
     return <LedScreen />;
   }
   return (
@@ -321,14 +324,16 @@ function Register({
               className={customerType === "retail" ? "active" : ""}
               onClick={() => setCustomerType("retail")}
             >
-              <User size={16} /> <span style={{ fontSize: "11px" }}>Khách hàng mua lẻ</span>
+              <User size={16} />{" "}
+              <span style={{ fontSize: "11px" }}>Khách hàng mua lẻ</span>
             </button>
             <button
               type="button"
               className={customerType === "agency" ? "active" : ""}
               onClick={() => setCustomerType("agency")}
             >
-              <Store size={16} /> <span style={{ fontSize: "11px" }}>Khách hàng đại lý</span>
+              <Store size={16} />{" "}
+              <span style={{ fontSize: "11px" }}>Khách hàng đại lý</span>
             </button>
           </div>
 
@@ -351,7 +356,16 @@ function Register({
           </div>
 
           {error && <p className="error">{error}</p>}
-          <button className="primary-red" disabled={disabled} style={{ minHeight: "54px", fontSize: "15px", marginTop: "12px", borderRadius: "8px" }}>
+          <button
+            className="primary-red"
+            disabled={disabled}
+            style={{
+              minHeight: "54px",
+              fontSize: "15px",
+              marginTop: "12px",
+              borderRadius: "8px",
+            }}
+          >
             BẮT ĐẦU CHƠI NGAY
           </button>
           <p className="privacy-note" style={{ fontSize: "10px" }}>
@@ -714,6 +728,9 @@ function Leaderboard({
   return (
     <main className="game-hero leaderboard-screen">
       <section className="leaderboard-panel">
+        <button className="icon-back" onClick={onBack} aria-label="Quay lại">
+          <ChevronLeft size={18} />
+        </button>
         <BrandHeader />
         <div className="leaderboard-header-title">
           <h1>
@@ -737,7 +754,7 @@ function Leaderboard({
             </article>
           ))}
         </div>
-        
+
         <div className="rank-list compact mobile-rank-list">
           {rest.length ? (
             rest.map((r, i) => (
@@ -788,7 +805,7 @@ function LedScreen() {
   useEffect(() => {
     const interval = setInterval(() => {
       fetch(`${API}/game/leaderboard`)
-        .then(r => r.ok ? r.json() : [])
+        .then((r) => (r.ok ? r.json() : []))
         .then((data: any[]) => {
           const sorted = [...data].sort((a, b) => {
             const aDuration = a.bestDuration ?? Infinity;
@@ -816,26 +833,53 @@ function LedScreen() {
         <div className="led-header">
           <div className="led-brand-box">
             <img src={logoMove} alt="Move" className="led-logo" />
-            <X size={32} strokeWidth={3} color="#94a3b8" className="led-cross" />
+            <X
+              size={26}
+              strokeWidth={3}
+              color="#94a3b8"
+              className="led-cross"
+            />
             <img src={logoKingsport} alt="Kingsport" className="led-logo" />
           </div>
-          <Zap fill="#ef1c30" color="#ef1c30" size={56} strokeWidth={3} className="led-zap" />
-          <h1 className="led-title-main">MOVE TO BE KING</h1>
-          <h2 className="led-title-sub">THE FASTER HAND</h2>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              marginTop: "70px",
+            }}
+          >
+            <Zap
+              fill="#ef1c30"
+              color="#ef1c30"
+              size={46}
+              strokeWidth={3}
+              className="led-zap"
+            />
+            <h1 className="led-title-main">MOVE TO BE KING</h1>
+            <h2 className="led-title-sub">THE FASTER HAND</h2>
+          </div>
         </div>
 
         {/* Podium */}
         <div className="led-podium-section">
           {podium.map((row, i) => (
-            <div className={`led-top-card led-pos-${i + 1}`} key={podiumLabels[i]}>
+            <div
+              className={`led-top-card led-pos-${i + 1}`}
+              key={podiumLabels[i]}
+            >
               <div className="led-orb">
                 <img
                   src={[imgTop2, imgTop1, imgTop3][i]}
                   alt={podiumLabels[i]}
                 />
               </div>
-              <strong className="led-rank-label">TOP {i === 0 ? 2 : i === 1 ? 1 : 3}</strong>
-              <strong className="led-name">{row?.fullName || "Đang chờ"}</strong>
+              <strong className="led-rank-label">
+                TOP {i === 0 ? 2 : i === 1 ? 1 : 3}
+              </strong>
+              <strong className="led-name">
+                {row?.fullName || "Đang chờ"}
+              </strong>
               <time className="led-time">{formatTime(row?.bestDuration)}</time>
             </div>
           ))}
@@ -847,9 +891,13 @@ function LedScreen() {
             {rest.length ? (
               rest.map((r, i) => (
                 <div className="led-rank-row" key={r.phone || i}>
-                  <div className="led-rank-index">{String(i + 4).padStart(2, '0')}</div>
+                  <div className="led-rank-index">
+                    {String(i + 4).padStart(2, "0")}
+                  </div>
                   <div className="led-rank-name">{r.fullName}</div>
-                  <div className="led-rank-time">{formatTime(r.bestDuration)}</div>
+                  <div className="led-rank-time">
+                    {formatTime(r.bestDuration)}
+                  </div>
                 </div>
               ))
             ) : (
@@ -867,20 +915,30 @@ function LedScreen() {
           <div className="led-rules-box">
             <h3 className="led-rules-title">THỂ LỆ QUÀ TẶNG</h3>
             <p className="led-rules-desc">
-              Người chơi phá kỷ lục Top 3 tại thời điểm tham gia sẽ<br/>
-              nhận ngay quà tặng độc quyền từ thương hiệu.<br/>
-              Kết thúc chương trình, Top 3 chung cuộc trên bảng xếp<br/>
-              hạng sẽ nhận:
+              Người chơi phá kỷ lục Top 3 tại thời điểm tham gia sẽ nhận ngay
+              quà tặng độc quyền từ thương hiệu.
+              <br />
+              Kết thúc chương trình, Top 3 chung cuộc trên bảng xếp hạng sẽ
+              nhận:
             </p>
-            <p><b>Top 1:</b> 01 xe máy điện MOVE Athena</p>
-            <p><b>Top 2:</b> 01 máy massage cầm tay Kingsport</p>
-            <p><b>Top 3:</b> 01 máy massage cầm tay Kingsport</p>
+            <p>
+              <b>Top 1:</b> 01 xe máy điện MOVE Athena
+            </p>
+            <p>
+              <b>Top 2:</b> 01 máy massage cầm tay Kingsport
+            </p>
+            <p>
+              <b>Top 3:</b> 01 máy massage cầm tay Kingsport
+            </p>
           </div>
           <div className="led-qr-section">
             <div className="led-qr-bg">
-              <QRCode value="https://mobile-puzzle-3x3.pages.dev/?play=1" size={130} />
+              <QRCode
+                value="https://mobile-puzzle-3x3.pages.dev/?play=1"
+                style={{ width: "100%", height: "100%" }}
+              />
             </div>
-            <span className="led-qr-text">Quét QR tham gia<br/>đường đua ngay</span>
+            <span className="led-qr-text">Quét QR tham gia đường đua ngay</span>
           </div>
         </div>
       </div>
@@ -928,13 +986,18 @@ function Admin() {
   const [exporting, setExporting] = useState(false);
 
   async function exportNocodb() {
-    if (!window.confirm("Bạn có chắc chắn muốn xuất toàn bộ lịch sử chơi sang NocoDB?")) return;
+    if (
+      !window.confirm(
+        "Bạn có chắc chắn muốn xuất toàn bộ lịch sử chơi sang NocoDB?",
+      )
+    )
+      return;
     setExporting(true);
     try {
       const res = await fetch(`${API}/admin/nocodb/export`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken") || ""}`
+          Authorization: `Bearer ${localStorage.getItem("adminToken") || ""}`,
         },
       });
       const data = await res.json();
@@ -972,7 +1035,7 @@ function Admin() {
         >
           Cấu hình Game
         </button>
-          <button
+        <button
           className={tab === "api_settings" ? "active" : ""}
           onClick={() => setTab("api_settings")}
         >
@@ -1264,7 +1327,10 @@ function History() {
   }
 
   async function exportNocodb() {
-    if (!window.confirm("Bạn có chắc chắn muốn xuất toàn bộ dữ liệu sang NocoDB?")) return;
+    if (
+      !window.confirm("Bạn có chắc chắn muốn xuất toàn bộ dữ liệu sang NocoDB?")
+    )
+      return;
     try {
       const res = await fetch(`${API}/admin/nocodb/export`, {
         method: "POST",
@@ -1315,7 +1381,12 @@ function History() {
               <tr key={r._id}>
                 <td>
                   {r.result === "WIN" && r.rank ? (
-                    <span style={{ fontWeight: r.rank <= 10 ? "bold" : "normal", color: r.rank <= 3 ? "#ef4444" : "inherit" }}>
+                    <span
+                      style={{
+                        fontWeight: r.rank <= 10 ? "bold" : "normal",
+                        color: r.rank <= 3 ? "#ef4444" : "inherit",
+                      }}
+                    >
                       Top {r.rank}
                     </span>
                   ) : (
@@ -1373,7 +1444,10 @@ function Users() {
   }
 
   async function exportNocodb() {
-    if (!window.confirm("Bạn có chắc chắn muốn xuất toàn bộ dữ liệu sang NocoDB?")) return;
+    if (
+      !window.confirm("Bạn có chắc chắn muốn xuất toàn bộ dữ liệu sang NocoDB?")
+    )
+      return;
     try {
       const res = await fetch(`${API}/admin/nocodb/export`, {
         method: "POST",
@@ -1597,7 +1671,10 @@ function ApiSettings() {
     try {
       if (config[field]) {
         const parsed = JSON.parse(config[field]);
-        setConfig((prev: any) => ({ ...prev, [field]: JSON.stringify(parsed, null, 2) }));
+        setConfig((prev: any) => ({
+          ...prev,
+          [field]: JSON.stringify(parsed, null, 2),
+        }));
       }
     } catch (e) {
       // ignore
@@ -1608,28 +1685,33 @@ function ApiSettings() {
     try {
       if (!config.apiGetUrl) return;
       let url = config.apiGetUrl;
-      try { url = decodeURI(url); } catch(e) {}
-      
-      const parts = url.split('?');
+      try {
+        url = decodeURI(url);
+      } catch (e) {}
+
+      const parts = url.split("?");
       if (parts.length > 1) {
         const baseUrl = parts[0];
-        const query = parts.slice(1).join('?');
-        const params = query.split('&');
+        const query = parts.slice(1).join("?");
+        const params = query.split("&");
         const formattedParams = params.map((p: string) => {
-          const eqIdx = p.indexOf('=');
+          const eqIdx = p.indexOf("=");
           if (eqIdx > -1) {
             const key = p.substring(0, eqIdx);
             const val = p.substring(eqIdx + 1);
             try {
               let parsed = JSON.parse(decodeURIComponent(val));
-              if (typeof parsed === 'object' && parsed !== null) {
+              if (typeof parsed === "object" && parsed !== null) {
                 return `${key}=${JSON.stringify(parsed, null, 2)}`;
               }
             } catch (e) {}
           }
           return p;
         });
-        setConfig((prev: any) => ({ ...prev, apiGetUrl: `${baseUrl}?${formattedParams.join('&')}` }));
+        setConfig((prev: any) => ({
+          ...prev,
+          apiGetUrl: `${baseUrl}?${formattedParams.join("&")}`,
+        }));
       }
     } catch (e) {}
   };
@@ -1651,132 +1733,422 @@ function ApiSettings() {
 
   return (
     <section>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, width: "100%" }}>
-        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#0f172a" }}>Cấu hình API</h1>
-        <button onClick={save} disabled={loading} style={{ minHeight: 40, padding: "0 20px", background: "#0f172a", borderRadius: 8, fontSize: 14 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 20,
+          width: "100%",
+        }}
+      >
+        <h1
+          style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#0f172a" }}
+        >
+          Cấu hình API
+        </h1>
+        <button
+          onClick={save}
+          disabled={loading}
+          style={{
+            minHeight: 40,
+            padding: "0 20px",
+            background: "#0f172a",
+            borderRadius: 8,
+            fontSize: 14,
+          }}
+        >
           {loading ? "Đang lưu..." : "Lưu cấu hình"}
         </button>
       </div>
-      
-      <div className="admin-card stack" style={{ width: "100%", maxHeight: "calc(100vh - 200px)", overflowY: "auto", padding: "32px 36px", gap: 28, borderRadius: 12, flexDirection: "column", flexWrap: "nowrap", alignItems: "stretch" }}>
-        
+
+      <div
+        className="admin-card stack"
+        style={{
+          width: "100%",
+          maxHeight: "calc(100vh - 200px)",
+          overflowY: "auto",
+          padding: "32px 36px",
+          gap: 28,
+          borderRadius: 12,
+          flexDirection: "column",
+          flexWrap: "nowrap",
+          alignItems: "stretch",
+        }}
+      >
         <div style={{ alignSelf: "flex-start" }}>
-          <button 
+          <button
             type="button"
             onClick={() => setShowHint(true)}
-            style={{ background: "transparent", color: "#3b82f6", fontSize: 14, fontWeight: 600, padding: 0, minHeight: "auto", textDecoration: "underline", display: "inline-flex", alignItems: "center", gap: 6 }}
+            style={{
+              background: "transparent",
+              color: "#3b82f6",
+              fontSize: 14,
+              fontWeight: 600,
+              padding: 0,
+              minHeight: "auto",
+              textDecoration: "underline",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+            }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
             Xem danh sách biến tự động
           </button>
-          
+
           {showHint && (
-            <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.4)", backdropFilter: "blur(2px)" }}>
-              <div style={{ background: "white", borderRadius: 12, width: "100%", maxWidth: 600, boxShadow: "0 20px 40px -10px rgba(0,0,0,0.15)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                
-                <div style={{ padding: "16px 24px", borderBottom: "1px solid #f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <h3 style={{ margin: 0, fontSize: 18, color: "#1e293b" }}>Danh sách biến</h3>
-                  <button onClick={() => setShowHint(false)} style={{ background: "transparent", border: "none", color: "#64748b", padding: 8, cursor: "pointer", minHeight: "auto" }}>
+            <div
+              style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 9999,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(0,0,0,0.4)",
+                backdropFilter: "blur(2px)",
+              }}
+            >
+              <div
+                style={{
+                  background: "white",
+                  borderRadius: 12,
+                  width: "100%",
+                  maxWidth: 600,
+                  boxShadow: "0 20px 40px -10px rgba(0,0,0,0.15)",
+                  display: "flex",
+                  flexDirection: "column",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    padding: "16px 24px",
+                    borderBottom: "1px solid #f1f5f9",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <h3 style={{ margin: 0, fontSize: 18, color: "#1e293b" }}>
+                    Danh sách biến
+                  </h3>
+                  <button
+                    onClick={() => setShowHint(false)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "#64748b",
+                      padding: 8,
+                      cursor: "pointer",
+                      minHeight: "auto",
+                    }}
+                  >
                     <X size={18} />
                   </button>
                 </div>
 
                 <div style={{ padding: 24 }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", background: "white", boxShadow: "none" }}>
+                  <table
+                    style={{
+                      width: "100%",
+                      borderCollapse: "collapse",
+                      background: "white",
+                      boxShadow: "none",
+                    }}
+                  >
                     <thead>
                       <tr>
-                        <th style={{ background: "transparent", color: "#94a3b8", fontSize: 12, textTransform: "uppercase", padding: "8px 12px", borderBottom: "1px solid #e2e8f0" }}>TÊN BIẾN</th>
-                        <th style={{ background: "transparent", color: "#94a3b8", fontSize: 12, textTransform: "uppercase", padding: "8px 12px", borderBottom: "1px solid #e2e8f0" }}>MÔ TẢ</th>
-                        <th style={{ background: "transparent", color: "#94a3b8", fontSize: 12, textTransform: "uppercase", padding: "8px 12px", borderBottom: "1px solid #e2e8f0" }}>LOẠI DỮ LIỆU</th>
+                        <th
+                          style={{
+                            background: "transparent",
+                            color: "#94a3b8",
+                            fontSize: 12,
+                            textTransform: "uppercase",
+                            padding: "8px 12px",
+                            borderBottom: "1px solid #e2e8f0",
+                          }}
+                        >
+                          TÊN BIẾN
+                        </th>
+                        <th
+                          style={{
+                            background: "transparent",
+                            color: "#94a3b8",
+                            fontSize: 12,
+                            textTransform: "uppercase",
+                            padding: "8px 12px",
+                            borderBottom: "1px solid #e2e8f0",
+                          }}
+                        >
+                          MÔ TẢ
+                        </th>
+                        <th
+                          style={{
+                            background: "transparent",
+                            color: "#94a3b8",
+                            fontSize: 12,
+                            textTransform: "uppercase",
+                            padding: "8px 12px",
+                            borderBottom: "1px solid #e2e8f0",
+                          }}
+                        >
+                          LOẠI DỮ LIỆU
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {[
                         { code: "{{top}}", desc: "Thứ hạng", type: "NUMBER" },
-                        { code: "{{phone}}", desc: "Số điện thoại", type: "TEXT" },
-                        { code: "{{name}}", desc: "Tên người chơi", type: "TEXT" },
-                        { code: "{{result}}", desc: "Kết quả chơi (WIN/LOSE)", type: "TEXT" },
-                        { code: "{{moves}}", desc: "Bước di chuyển", type: "NUMBER" },
-                        { code: "{{duration}}", desc: "Thời gian", type: "NUMBER" },
-                        { code: "{{score}}", desc: "Điểm", type: "NUMBER" }
-                      ].map(v => (
+                        {
+                          code: "{{phone}}",
+                          desc: "Số điện thoại",
+                          type: "TEXT",
+                        },
+                        {
+                          code: "{{name}}",
+                          desc: "Tên người chơi",
+                          type: "TEXT",
+                        },
+                        {
+                          code: "{{result}}",
+                          desc: "Kết quả chơi (WIN/LOSE)",
+                          type: "TEXT",
+                        },
+                        {
+                          code: "{{moves}}",
+                          desc: "Bước di chuyển",
+                          type: "NUMBER",
+                        },
+                        {
+                          code: "{{duration}}",
+                          desc: "Thời gian",
+                          type: "NUMBER",
+                        },
+                        { code: "{{score}}", desc: "Điểm", type: "NUMBER" },
+                      ].map((v) => (
                         <tr key={v.code}>
-                          <td style={{ padding: "12px", borderBottom: "1px solid #f1f5f9" }}>
-                            <button 
+                          <td
+                            style={{
+                              padding: "12px",
+                              borderBottom: "1px solid #f1f5f9",
+                            }}
+                          >
+                            <button
                               onClick={() => {
                                 navigator.clipboard.writeText(v.code);
                                 alert("Đã copy: " + v.code);
                               }}
-                              style={{ 
-                                background: "#f3e8ff", color: "#9333ea", padding: "4px 10px", 
-                                borderRadius: 999, fontSize: 13, fontFamily: "monospace", 
-                                border: "none", cursor: "pointer", minHeight: "auto",
-                                transition: "background 0.2s"
+                              style={{
+                                background: "#f3e8ff",
+                                color: "#9333ea",
+                                padding: "4px 10px",
+                                borderRadius: 999,
+                                fontSize: 13,
+                                fontFamily: "monospace",
+                                border: "none",
+                                cursor: "pointer",
+                                minHeight: "auto",
+                                transition: "background 0.2s",
                               }}
                               title="Click để copy"
                             >
                               {v.code}
                             </button>
                           </td>
-                          <td style={{ padding: "12px", borderBottom: "1px solid #f1f5f9", fontSize: 14, color: "#475569" }}>{v.desc}</td>
-                          <td style={{ padding: "12px", borderBottom: "1px solid #f1f5f9", fontSize: 14, color: "#475569" }}>{v.type}</td>
+                          <td
+                            style={{
+                              padding: "12px",
+                              borderBottom: "1px solid #f1f5f9",
+                              fontSize: 14,
+                              color: "#475569",
+                            }}
+                          >
+                            {v.desc}
+                          </td>
+                          <td
+                            style={{
+                              padding: "12px",
+                              borderBottom: "1px solid #f1f5f9",
+                              fontSize: 14,
+                              color: "#475569",
+                            }}
+                          >
+                            {v.type}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                  <p style={{ margin: "16px 0 0", fontSize: 13, color: "#64748b", textAlign: "center" }}>* Nhấn vào tên biến để copy nhanh.</p>
+                  <p
+                    style={{
+                      margin: "16px 0 0",
+                      fontSize: 13,
+                      color: "#64748b",
+                      textAlign: "center",
+                    }}
+                  >
+                    * Nhấn vào tên biến để copy nhanh.
+                  </p>
                 </div>
-
               </div>
             </div>
           )}
         </div>
 
-        <label style={{ display: "grid", gap: 10, fontSize: 15, fontWeight: 700, color: "#0f172a" }}>
+        <label
+          style={{
+            display: "grid",
+            gap: 10,
+            fontSize: 15,
+            fontWeight: 700,
+            color: "#0f172a",
+          }}
+        >
           Post API URL
           <input
             value={config.apiPostUrl || ""}
-            onChange={(e) => setConfig({ ...config, apiPostUrl: e.target.value })}
+            onChange={(e) =>
+              setConfig({ ...config, apiPostUrl: e.target.value })
+            }
             placeholder="https://api.smax.ai/..."
-            style={{ background: "#f8fafc", border: "1px solid #cbd4df", minHeight: 46, borderRadius: 8, padding: "0 16px", fontWeight: 400, color: "#0f172a", fontSize: 14 }}
+            style={{
+              background: "#f8fafc",
+              border: "1px solid #cbd4df",
+              minHeight: 46,
+              borderRadius: 8,
+              padding: "0 16px",
+              fontWeight: 400,
+              color: "#0f172a",
+              fontSize: 14,
+            }}
           />
         </label>
 
-        <label style={{ display: "grid", gap: 10, fontSize: 15, fontWeight: 700, color: "#0f172a" }}>
-          Headers <span style={{ fontSize: 13, fontWeight: 400, color: "#64748b" }}>(Định dạng JSON)</span>
+        <label
+          style={{
+            display: "grid",
+            gap: 10,
+            fontSize: 15,
+            fontWeight: 700,
+            color: "#0f172a",
+          }}
+        >
+          Headers{" "}
+          <span style={{ fontSize: 13, fontWeight: 400, color: "#64748b" }}>
+            (Định dạng JSON)
+          </span>
           <textarea
             value={config.apiHeaders || ""}
-            onChange={(e) => setConfig({ ...config, apiHeaders: e.target.value })}
+            onChange={(e) =>
+              setConfig({ ...config, apiHeaders: e.target.value })
+            }
             onBlur={() => handleFormatJson("apiHeaders")}
             placeholder={`{\n  "Authorization": "Bearer ..."\n}`}
             rows={4}
-            style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px solid #cbd4df", background: "#f8fafc", resize: "vertical", overflowY: "auto", fontSize: 13, lineHeight: 1.6, color: "#334155" }}
+            style={{
+              fontFamily: "'Fira Code', monospace",
+              width: "100%",
+              padding: 16,
+              borderRadius: 8,
+              border: "1px solid #cbd4df",
+              background: "#f8fafc",
+              resize: "vertical",
+              overflowY: "auto",
+              fontSize: 13,
+              lineHeight: 1.6,
+              color: "#334155",
+            }}
           />
         </label>
 
-        <label style={{ display: "grid", gap: 10, fontSize: 15, fontWeight: 700, color: "#0f172a" }}>
-          Body <span style={{ fontSize: 13, fontWeight: 400, color: "#64748b" }}>(Định dạng JSON)</span>
+        <label
+          style={{
+            display: "grid",
+            gap: 10,
+            fontSize: 15,
+            fontWeight: 700,
+            color: "#0f172a",
+          }}
+        >
+          Body{" "}
+          <span style={{ fontSize: 13, fontWeight: 400, color: "#64748b" }}>
+            (Định dạng JSON)
+          </span>
           <textarea
             value={config.apiBody || ""}
             onChange={(e) => setConfig({ ...config, apiBody: e.target.value })}
             onBlur={() => handleFormatJson("apiBody")}
             placeholder={`{\n  "sdt": "<sdt here>",\n  "name": "<name here>"\n}`}
             rows={8}
-            style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px solid #cbd4df", background: "#f8fafc", resize: "vertical", overflowY: "auto", fontSize: 13, lineHeight: 1.6, color: "#334155" }}
+            style={{
+              fontFamily: "'Fira Code', monospace",
+              width: "100%",
+              padding: 16,
+              borderRadius: 8,
+              border: "1px solid #cbd4df",
+              background: "#f8fafc",
+              resize: "vertical",
+              overflowY: "auto",
+              fontSize: 13,
+              lineHeight: 1.6,
+              color: "#334155",
+            }}
           />
         </label>
-        
-        <div style={{ height: 1, background: "#e2e8f0", margin: "4px 0" }}></div>
 
-        <label style={{ display: "grid", gap: 10, fontSize: 14, fontWeight: 600, color: "#64748b" }}>
-          Hoặc Get API <span style={{ fontSize: 13, fontWeight: 400, color: "#94a3b8" }}>(Sử dụng nếu không dùng Post)</span>
+        <div
+          style={{ height: 1, background: "#e2e8f0", margin: "4px 0" }}
+        ></div>
+
+        <label
+          style={{
+            display: "grid",
+            gap: 10,
+            fontSize: 14,
+            fontWeight: 600,
+            color: "#64748b",
+          }}
+        >
+          Hoặc Get API{" "}
+          <span style={{ fontSize: 13, fontWeight: 400, color: "#94a3b8" }}>
+            (Sử dụng nếu không dùng Post)
+          </span>
           <textarea
             value={config.apiGetUrl || ""}
-            onChange={(e) => setConfig({ ...config, apiGetUrl: e.target.value })}
+            onChange={(e) =>
+              setConfig({ ...config, apiGetUrl: e.target.value })
+            }
             onBlur={handleFormatGetUrl}
             placeholder="https://api.smax.ai/...&access_token=..."
             rows={3}
-            style={{ fontFamily: "'Fira Code', monospace", width: "100%", padding: 16, borderRadius: 8, border: "1px dashed #cbd4df", background: "#f1f5f9", resize: "vertical", overflowY: "auto", fontSize: 13, lineHeight: 1.6, color: "#475569" }}
+            style={{
+              fontFamily: "'Fira Code', monospace",
+              width: "100%",
+              padding: 16,
+              borderRadius: 8,
+              border: "1px dashed #cbd4df",
+              background: "#f1f5f9",
+              resize: "vertical",
+              overflowY: "auto",
+              fontSize: 13,
+              lineHeight: 1.6,
+              color: "#475569",
+            }}
           />
         </label>
       </div>
