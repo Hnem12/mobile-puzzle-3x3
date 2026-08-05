@@ -776,7 +776,7 @@ function Leaderboard({ result }: { result?: any }) {
   const podiumLabels = ["TOP 2", "TOP 1", "TOP 3"];
   const rest = rows.slice(3);
 
-  const isPlayerInTop = result && result.rank && result.rank <= 10;
+  const isPlayerInTop = result && result.rank && result.rank <= 5;
   const shouldShowBottomRank = result && result.rank && !isPlayerInTop;
 
   return (
