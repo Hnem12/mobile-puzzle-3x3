@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Bell,
@@ -844,6 +844,7 @@ function Leaderboard({
 
 function LedScreen() {
   const [rows, setRows] = useState<any[]>([]);
+  const [scale, setScale] = useState({ x: 1, y: 1 });
 
   useEffect(() => {
     fetch(`${API}/game/leaderboard`)
@@ -887,13 +888,32 @@ function LedScreen() {
     return () => clearInterval(interval);
   }, []);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function handleResize() {
+      if (!containerRef.current || !containerRef.current.parentElement) return;
+      const winW = containerRef.current.parentElement.clientWidth;
+      const winH = containerRef.current.parentElement.clientHeight;
+      const scaleW = winW / 1080;
+      const scaleH = winH / 1920;
+      setScale({ x: scaleW, y: scaleH });
+    }
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const podium = [rows[1], rows[0], rows[2]];
   const podiumLabels = ["TOP 2", "TOP 1", "TOP 3"];
   const rest = rows.slice(3);
 
   return (
     <main className="led-screen">
-      <div className="led-container">
+      <div
+        ref={containerRef}
+        className="led-container"
+        style={{ transform: `scale(${scale.x}, ${scale.y})` }}
+      >
         {/* Header */}
         <div className="led-header">
           <div className="led-brand-box">
