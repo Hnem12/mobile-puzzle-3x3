@@ -1155,13 +1155,11 @@ th { background: #f8fafc; color: #4b5563; font-weight: 600; }
   margin-top: 4px;
 }
 
-.mobile-rank-list {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 33, 56, 0.35);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0px 8px 22px rgba(255, 33, 56, 0.20);
-  border-radius: 12px;
+.rank-list.mobile-rank-list {
+  background: linear-gradient(180deg, #3a151b 0%, #200d11 100%);
+  border: 2px solid #5a1e27;
+  border-radius: 16px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, .4);
   padding: 16px;
   position: relative;
   padding-bottom: 70px;
