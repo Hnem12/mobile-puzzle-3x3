@@ -299,9 +299,9 @@ function Register({
             <input
               required
               type="tel"
-              pattern="[0-9]{10}"
+              pattern="0[0-9]{9}"
               maxLength={10}
-              title="Số điện thoại phải gồm đúng 10 chữ số"
+              title="Số điện thoại phải gồm đúng 10 chữ số và bắt đầu bằng số 0"
               placeholder="Nhập số điện thoại..."
               value={phone}
               onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
