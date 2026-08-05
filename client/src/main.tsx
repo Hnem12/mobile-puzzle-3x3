@@ -692,35 +692,53 @@ function Result({
 
         <div className="leaderboard-card">
           <div className="top-board">
-            {podium.map((row, i) => (
-              <article
-                className={`top-card top-${i + 1}`}
-                key={podiumLabels[i]}
-              >
-                <div className="prize-orb">
-                  <span className="prize-orb-text">{podiumLabels[i]}</span>
-                </div>
-                <b>{row?.fullName || "Chưa có dữ liệu"}</b>
-                <time>{formatTime(row?.bestDuration)}</time>
-              </article>
-            ))}
+            {podium.map((row, i) => {
+              const isMe =
+                row?.phone &&
+                result?.user?.phone &&
+                row.phone === result.user.phone;
+              return (
+                <article
+                  className={`top-card top-${i + 1}`}
+                  key={podiumLabels[i]}
+                >
+                  <div className="prize-orb">
+                    <span className="prize-orb-text">{podiumLabels[i]}</span>
+                  </div>
+                  <b>
+                    {row?.fullName || "Chưa có dữ liệu"}
+                    {isMe && " (Bạn)"}
+                  </b>
+                  <time>{formatTime(row?.bestDuration)}</time>
+                </article>
+              );
+            })}
           </div>
           <div className="rank-list compact">
             {rest.length ? (
-              rest.map((row, i) => (
-                <div className="rank-item" key={row.phone || i}>
-                  <span className="rank-idx">{i + 4}</span>
-                  <div className="rank-info">
-                    <strong>{row.fullName}</strong>
-                    {row.phone && (
-                      <small>
-                        {row.phone.slice(0, 3)}***{row.phone.slice(-3)}
-                      </small>
-                    )}
+              rest.map((row, i) => {
+                const isMe =
+                  row?.phone &&
+                  result?.user?.phone &&
+                  row.phone === result.user.phone;
+                return (
+                  <div className="rank-item" key={row.phone || i}>
+                    <span className="rank-idx">{i + 4}</span>
+                    <div className="rank-info">
+                      <strong>
+                        {row.fullName}
+                        {isMe && "(Bạn)"}
+                      </strong>
+                      {row.phone && (
+                        <small>
+                          {row.phone.slice(0, 3)}***{row.phone.slice(-3)}
+                        </small>
+                      )}
+                    </div>
+                    <b className="rank-time">{formatTime(row.bestDuration)}</b>
                   </div>
-                  <b className="rank-time">{formatTime(row.bestDuration)}</b>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="rank-item">
                 <span className="rank-idx">
@@ -795,26 +813,47 @@ function Leaderboard({ result }: { result?: any }) {
           </p>
         </div>
         <div className="leaderboard-top-board">
-          {podium.map((row, i) => (
-            <article className={`top-card top-${i + 1}`} key={podiumLabels[i]}>
-              <div className="prize-orb">
-                <span className="prize-orb-text">{podiumLabels[i]}</span>
-              </div>
-              <b>{row?.fullName || "Đang chờ"}</b>
-              <time>{formatTime(row?.bestDuration)}</time>
-            </article>
-          ))}
+          {podium.map((row, i) => {
+            const isMe =
+              row?.phone &&
+              result?.user?.phone &&
+              row.phone === result.user.phone;
+            return (
+              <article
+                className={`top-card top-${i + 1}`}
+                key={podiumLabels[i]}
+              >
+                <div className="prize-orb">
+                  <span className="prize-orb-text">{podiumLabels[i]}</span>
+                </div>
+                <b>
+                  {row?.fullName || "Đang chờ"}
+                  {isMe && " (Bạn)"}
+                </b>
+                <time>{formatTime(row?.bestDuration)}</time>
+              </article>
+            );
+          })}
         </div>
 
         <div className="rank-list compact mobile-rank-list">
           {rest.length ? (
-            rest.map((r, i) => (
-              <p key={r.phone || i}>
-                <span>{String(i + 4).padStart(2, "0")}</span>
-                <strong>{r.fullName}</strong>
-                <b>{formatTime(r.bestDuration)}</b>
-              </p>
-            ))
+            rest.map((r, i) => {
+              const isMe =
+                r?.phone &&
+                result?.user?.phone &&
+                r.phone === result.user.phone;
+              return (
+                <p key={r.phone || i}>
+                  <span>{String(i + 4).padStart(2, "0")}</span>
+                  <strong>
+                    {r.fullName}
+                    {isMe && " (Bạn)"}
+                  </strong>
+                  <b>{formatTime(r.bestDuration)}</b>
+                </p>
+              );
+            })
           ) : (
             <p>
               <span>04</span>
